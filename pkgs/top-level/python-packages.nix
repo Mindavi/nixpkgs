@@ -108,7 +108,7 @@ in {
   inherit buildSetupcfg;
 
   inherit (callPackage ../development/interpreters/python/hooks { })
-    eggUnpackHook eggBuildHook eggInstallHook flitBuildHook pipBuildHook pipInstallHook pytestCheckHook pythonCatchConflictsHook pythonImportsCheckHook pythonRemoveBinBytecodeHook setuptoolsBuildHook setuptoolsCheckHook venvShellHook wheelUnpackHook;
+    eggUnpackHook eggBuildHook eggInstallHook flitBuildHook pipBuildHook pipInstallHook pytestCheckHook pythonCatchConflictsHook pythonImportsCheckHook pythonRemoveBinBytecodeHook pythonRemoveTestsDirHook setuptoolsBuildHook setuptoolsCheckHook venvShellHook wheelUnpackHook;
 
   # helpers
 
@@ -121,7 +121,10 @@ in {
 
   recursivePthLoader = callPackage ../development/python-modules/recursive-pth-loader { };
 
-  setuptools = callPackage ../development/python-modules/setuptools { };
+  setuptools = if isPy27 then
+    callPackage ../development/python-modules/setuptools/44.0.nix { }
+  else
+    callPackage ../development/python-modules/setuptools { };
 
   vowpalwabbit = callPackage ../development/python-modules/vowpalwabbit { };
 
@@ -522,6 +525,8 @@ in {
 
   bugseverywhere = throw "bugseverywhere has been removed: Abandoned by upstream."; # Added 2019-11-27
 
+  bugsnag = callPackage ../development/python-modules/bugsnag { };
+
   cachecontrol = callPackage ../development/python-modules/cachecontrol { };
 
   cachelib = callPackage ../development/python-modules/cachelib { };
@@ -799,11 +804,15 @@ in {
 
   inquirer = callPackage ../development/python-modules/inquirer { };
 
+  ipympl = callPackage ../development/python-modules/ipympl { };
+
   itanium_demangler = callPackage ../development/python-modules/itanium_demangler { };
 
   janus = callPackage ../development/python-modules/janus { };
 
   jc = callPackage ../development/python-modules/jc { };
+
+  jellyfin-apiclient-python = callPackage ../development/python-modules/jellyfin-apiclient-python { };
 
   jira = callPackage ../development/python-modules/jira { };
 
@@ -1243,6 +1252,8 @@ in {
 
   pystache = callPackage ../development/python-modules/pystache { };
 
+  pystray = callPackage ../development/python-modules/pystray { };
+
   pytelegrambotapi = callPackage ../development/python-modules/pyTelegramBotAPI { };
 
   pytesseract = callPackage ../development/python-modules/pytesseract { };
@@ -1342,6 +1353,8 @@ in {
   PyWebDAV = callPackage ../development/python-modules/pywebdav { };
 
   pywebpush = callPackage ../development/python-modules/pywebpush { };
+
+  pywebview = callPackage ../development/python-modules/pywebview { };
 
   pywick = callPackage ../development/python-modules/pywick { };
 
@@ -5451,6 +5464,8 @@ in {
   selectors34 = callPackage ../development/python-modules/selectors34 { };
 
   Pyro4 = callPackage ../development/python-modules/pyro4 { };
+
+  Pyro5 = callPackage ../development/python-modules/pyro5 { };
 
   rope = callPackage ../development/python-modules/rope { };
 

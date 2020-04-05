@@ -3096,6 +3096,12 @@
     githubId = 4401220;
     name = "Michael Eden";
   };
+  illiusdope = {
+    email = "mat@marini.ca";
+    github = "illiusdope";
+    gitHubId = 61913481;
+    name = "Mat Marini";
+  };
   ilya-fedin = {
     email = "fedin-ilja2010@ya.ru";
     github = "ilya-fedin";
@@ -3589,6 +3595,12 @@
     email = "johannes@jorsn.eu";
     github = "jorsn";
     githubId = 4646725;
+  };
+  joshuafern = {
+    name = "Joshua Fern";
+    email = "joshuafern@protonmail.com";
+    github = "JoshuaFern";
+    githubId = 4300747;
   };
   jpas = {
     name = "Jarrod Pas";
@@ -5492,6 +5504,12 @@
     githubId = 11016164;
     name = "Fedor Pakhomov";
   };
+  paluh = {
+    email = "paluho@gmail.com";
+    github = "paluh";
+    githubId = 190249;
+    name = "Tomasz Rybarczyk";
+  };
   pamplemousse = {
     email = "xav.maso@gmail.com";
     github = "Pamplemousse";
@@ -5880,6 +5898,12 @@
     github = "PyroLagus";
     githubId = 4579165;
     name = "Danny Bautista";
+  };
+  peelz = {
+    email = "peelz.dev+nixpkgs@gmail.com";
+    github = "louistakepillz";
+    githubId = 920910;
+    name = "peelz";
   };
   q3k = {
     email = "q3k@q3k.org";
