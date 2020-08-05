@@ -17,13 +17,13 @@ let
   libtokencap = callPackage ./libtokencap.nix { inherit aflplusplus; };
   aflplusplus = stdenvNoCC.mkDerivation rec {
     pname = "aflplusplus";
-    version = "2.66c";
+    version = "2.66d";
 
     src = fetchFromGitHub {
       owner = "AFLplusplus";
       repo = "AFLplusplus";
-      rev = version;
-      sha256 = "0nsr61lmhwg0zn7kn98ifc20y9w19p857gl414c226cz4v0dl53g";
+      rev = "dev";
+      sha256 = "1nbb8cpsnwgpcx6kbm091436m3ax2in5p3845q8xslnw63hvdnia";
     };
     enableParallelBuilding = true;
 
@@ -32,15 +32,6 @@ let
     nativeBuildInputs = [ makeWrapper which clang gcc ];
     buildInputs = [ llvm python gmp ]
       ++ stdenv.lib.optional (wine != null) python.pkgs.wrapPython;
-
-    patches = [
-      (fetchpatch {
-        # patch that prevents an error during execution of the unit tests (unicornafl is tested while it's not built)
-        # see https://github.com/AFLplusplus/AFLplusplus/issues/487 for upstream discussion
-        url = "https://github.com/AFLplusplus/AFLplusplus/commit/cc74efa35e190d15533f99a5a99b698e772fbe81.patch";
-        sha256 = "174q51m094jil9pr8rjnkfrnf5p6lvmdmdnrnfgbhkv18bgr8p23";
-      })
-    ];
 
     postPatch = ''
       # Replace the CLANG_BIN variables with the correct path
@@ -116,14 +107,29 @@ let
     doInstallCheck = true;
     installCheckPhase = ''
       # replace references to tools in build directory with references to installed locations
-      substituteInPlace test/test.sh \
+      substituteInPlace test/test-compcov.sh \
         --replace '../libcompcov.so' '`$out/bin/get-afl-qemu-libcompcov-so`' \
         --replace '../libdislocator.so' '`$out/bin/get-libdislocator-so`' \
         --replace '../libtokencap.so' '`$out/bin/get-libtokencap-so`'
       # replace all occurences of relative paths (e.g. ../afl-fuzz) with $out/bin/afl-fuzz
       # only works for a single path up
-      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test.sh
-      cd test && ./test.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-basic.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-compcov.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-custom-mutators.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-gcc-plugin.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-llvm-lto.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-llvm.sh
+      #perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-qemu-mode.sh
+      perl -pi -e 's|(?<!\.)(?<!-I)(\.\./)([^\s\/]+?)(?<!\.c)(?<!\.s?o)(?=\s)|\$out/bin/\2|g' test/test-unittests.sh
+      cd test && ./test-basic.sh
+      ./test-compcov.sh
+      ./test-custom-mutators.sh
+      ./test-gcc-plugin.sh
+      ./test-llvm-lto.sh
+      ./test-llvm.sh
+      #./test-qemu-mode.sh
+      ./test-unicorn-mode.sh
+      ./test-unittests.sh
     '';
 
     passthru = {
