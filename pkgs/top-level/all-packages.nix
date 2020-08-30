@@ -10061,6 +10061,7 @@ in
   } // (stdenv.lib.optionalAttrs (stdenv.hostPlatform.isi686 && stdenv.cc.isGNU) {
       stdenv = gcc6Stdenv; # with gcc-7: undefined reference to `__divmoddi4'
   }));
+  spidermonkey_45 = callPackage ../development/interpreters/spidermonkey/45.nix { };
   spidermonkey_60 = callPackage ../development/interpreters/spidermonkey/60.nix { };
   spidermonkey_68 = callPackage ../development/interpreters/spidermonkey/68.nix { };
   spidermonkey = spidermonkey_38;
@@ -24964,6 +24965,10 @@ in
   });
 
   zeroad = zeroadPackages.zeroad;
+
+  zeroadUnstablePackages = dontRecurseIntoAttrs (callPackage ../games/0ad/unstable { });
+
+  zeroadUnstable = zeroadUnstablePackages.zeroad;
 
   ### DESKTOP ENVIRONMENTS
 
