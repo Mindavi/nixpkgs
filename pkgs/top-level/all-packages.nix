@@ -673,10 +673,9 @@ in
   honggfuzz = callPackage ../tools/security/honggfuzz { };
 
   aflplusplus = callPackage ../tools/security/aflplusplus {
-    clang = clang_9;
-    llvm = llvm_9;
-    python = python37;
-    wine = null;
+    clang = clang_11;
+    llvm = llvm_11;
+    python = python3;
   };
 
   libdislocator = callPackage ../tools/security/afl/libdislocator.nix { };
