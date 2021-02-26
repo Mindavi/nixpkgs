@@ -1,0 +1,11 @@
+--- meson_options.txt	2021-02-20 11:49:06.607755561 +0100
++++ meson_options.txt	2021-02-20 11:49:48.616670154 +0100
+@@ -1,6 +1,6 @@
+-option('docs', type: 'boolean', value: true, yield: true,
++option('docs', type: 'boolean', value: false, yield: true,
+        description: 'Generate API documentation with gtk-doc')
+-option('man', type: 'boolean', value: true, yield: true,
++option('man', type: 'boolean', value: false, yield: true,
+        description: 'Install man pages')
+ option('override_sqlite_version_check', type: 'boolean', value: false,
+        description: 'Override checks for broken sqlite versions')
