@@ -8,15 +8,15 @@
 
 stdenv.mkDerivation rec {
   pname = "sbt";
-  version = "1.4.7";
+  version = "1.4.8";
 
   src = fetchurl {
     url =
       "https://github.com/sbt/sbt/releases/download/v${version}/sbt-${version}.tgz";
-    sha256 = "sha256-wqdZ/kCjwhoWtaiNAM1m869vByHk6mG2OULfuDotVP0=";
+    sha256 = "sha256-WXItvaPW0dfsfcPiHWGi6AAjAwpCQ4I+7q3XftnFo50=";
   };
 
-  patchPhase = ''
+  postPatch = ''
     echo -java-home ${jre.home} >>conf/sbtopts
   '';
 
@@ -25,17 +25,16 @@ stdenv.mkDerivation rec {
   buildInputs = lib.optionals stdenv.isLinux [ zlib ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/sbt $out/bin
     cp -ra . $out/share/sbt
     ln -sT ../share/sbt/bin/sbt $out/bin/sbt
     ln -sT ../share/sbt/bin/sbtn-x86_64-${
       if (stdenv.isDarwin) then "apple-darwin" else "pc-linux"
     } $out/bin/sbtn
-  '';
 
-  doInstallCheck = true;
-  installCheckPhase = ''
-    ($out/bin/sbt --offline --version 2>&1 || true) | grep 'getting org.scala-sbt sbt ${version}  (this may take some time)'
+    runHook postInstall
   '';
 
   meta = with lib; {

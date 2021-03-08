@@ -242,6 +242,8 @@ let
 
     digestif =  callPackage ../development/ocaml-modules/digestif { };
 
+    directories =  callPackage ../development/ocaml-modules/directories { };
+
     dispatch =  callPackage ../development/ocaml-modules/dispatch { };
 
     dns =  callPackage ../development/ocaml-modules/dns { };
@@ -274,7 +276,7 @@ let
 
     dum = callPackage ../development/ocaml-modules/dum { };
 
-    dune = callPackage ../development/tools/ocaml/dune { };
+    dune_1 = callPackage ../development/tools/ocaml/dune/1.nix { };
 
     dune_2 =
       if lib.versionAtLeast ocaml.version "4.08"

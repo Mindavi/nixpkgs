@@ -16,14 +16,14 @@ let
   # 1) change all these hashes
   # 2) nix-build -A tree-sitter.updater.update-all-grammars
   # 3) run the ./result script that is output by that (it updates ./grammars)
-  version = "0.17.3";
-  sha256 = "sha256-uQs80r9cPX8Q46irJYv2FfvuppwonSS5HVClFujaP+U=";
-  cargoSha256 = "sha256-fonlxLNh9KyEwCj7G5vxa7cM/DlcHNFbQpp0SwVQ3j4=";
+  version = "0.18.2";
+  sha256 = "1kh3bqn28nal3mmwszbih8hbq25vxy3zd45pzj904yf0ds5ql684";
+  cargoSha256 = "06jbn4ai5lrxzv51vfjzjs7kgxw4nh2vbafc93gma4k14gggyygc";
 
   src = fetchFromGitHub {
     owner = "tree-sitter";
     repo = "tree-sitter";
-    rev = version;
+    rev = "v${version}";
     inherit sha256;
     fetchSubmodules = true;
   };
@@ -108,7 +108,7 @@ in rustPlatform.buildRustPackage {
     };
   };
 
-  meta = {
+  meta = with lib; {
     homepage = "https://github.com/tree-sitter/tree-sitter";
     description = "A parser generator tool and an incremental parsing library";
     longDescription = ''
@@ -122,10 +122,9 @@ in rustPlatform.buildRustPackage {
       * Robust enough to provide useful results even in the presence of syntax errors
       * Dependency-free so that the runtime library (which is written in pure C) can be embedded in any application
     '';
-    license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ Profpatsch ];
+    license = licenses.mit;
+    maintainers = with maintainers; [ Profpatsch ];
     # Aarch has test failures with how tree-sitter compiles the generated C files
     broken = stdenv.isAarch64;
   };
-
 }

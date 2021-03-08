@@ -365,8 +365,8 @@ let
         mktplcRef = {
           name = "todo-tree";
           publisher = "Gruntfuggly";
-          version = "0.0.196";
-          sha256 = "1l4f290018f2p76q6hn2b2injps6wz65as7dm537wrsvsivyg2qz";
+          version = "0.0.201";
+          sha256 = "1hjck1r2byc45rp28gn15wbmcrl1wjng7kn5lyhr6mgjjwqh5pa8";
         };
         meta = with lib; {
           license = licenses.mit;
@@ -523,6 +523,8 @@ let
           license = lib.licenses.mit;
         };
       };
+
+      ms-dotnettools.csharp = callPackage ./ms-dotnettools-csharp { };
 
       ms-kubernetes-tools.vscode-kubernetes-tools = buildVscodeMarketplaceExtension {
         mktplcRef = {
