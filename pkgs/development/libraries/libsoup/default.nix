@@ -1,5 +1,5 @@
 { stdenv, lib, fetchurl, glib, libxml2, meson, ninja, pkg-config, gnome3, libsysprof-capture
-, gnomeSupport ? true, sqlite, glib-networking, gobject-introspection, vala
+, gnomeSupport ? true, sqlite, glib-networking
 , libpsl, python3, brotli
 }:
 
@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals stdenv.isLinux [
     libsysprof-capture
   ];
-  nativeBuildInputs = [ meson ninja pkg-config gobject-introspection vala glib ];
+  nativeBuildInputs = [ meson ninja pkg-config glib ];
   propagatedBuildInputs = [ glib libxml2 ];
 
   NIX_CFLAGS_COMPILE = [ "-lpthread" ];
@@ -35,7 +35,8 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "-Dtls_check=false" # glib-networking is a runtime dependency, not a compile-time dependency
     "-Dgssapi=disabled"
-    "-Dvapi=enabled"
+    "-Dvapi=disabled"
+    "-Dintrospection=disabled"
     "-Dgnome=${lib.boolToString gnomeSupport}"
     "-Dntlm=disabled"
   ] ++ lib.optionals (!stdenv.isLinux) [
