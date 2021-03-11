@@ -1462,7 +1462,10 @@ in {
 
   constantly = callPackage ../development/python-modules/constantly { };
 
-  construct = callPackage ../development/python-modules/construct { };
+  construct = if isPy27 then
+    callPackage ../development/python-modules/construct/2.10.54.nix { }
+  else
+    callPackage ../development/python-modules/construct { };
 
   consul = callPackage ../development/python-modules/consul { };
 
@@ -1472,7 +1475,10 @@ in {
 
   contextvars = callPackage ../development/python-modules/contextvars { };
 
-  convertdate = callPackage ../development/python-modules/convertdate { };
+  convertdate = if isPy27 then
+    callPackage ../development/python-modules/convertdate/2.2.x.nix { }
+  else
+    callPackage ../development/python-modules/convertdate { };
 
   cookiecutter = callPackage ../development/python-modules/cookiecutter { };
 
@@ -1666,7 +1672,10 @@ in {
     inherit (pkgs.llvmPackages) libcxx;
   };
 
-  dateparser = callPackage ../development/python-modules/dateparser { };
+  dateparser = if isPy27 then
+    callPackage ../development/python-modules/dateparser/0.x.nix { }
+  else
+    callPackage ../development/python-modules/dateparser { };
 
   datrie = callPackage ../development/python-modules/datrie { };
 
@@ -2213,9 +2222,11 @@ in {
 
   fake_factory = callPackage ../development/python-modules/fake_factory { };
 
+  fake-useragent = callPackage ../development/python-modules/fake-useragent { };
+
   faker = callPackage ../development/python-modules/faker { };
 
-  fake-useragent = callPackage ../development/python-modules/fake-useragent { };
+  fakeredis = callPackage ../development/python-modules/fakeredis { };
 
   falcon = callPackage ../development/python-modules/falcon { };
 
@@ -2895,7 +2906,10 @@ in {
 
   gspread = callPackage ../development/python-modules/gspread { };
 
-  gssapi = callPackage ../development/python-modules/gssapi { inherit (pkgs) darwin krb5Full; };
+  gssapi = callPackage ../development/python-modules/gssapi {
+    inherit (pkgs) krb5Full;
+    inherit (pkgs.darwin.apple_sdk.frameworks) GSS;
+  };
 
   gst-python = callPackage ../development/python-modules/gst-python {
     inherit (pkgs) meson;
@@ -3132,9 +3146,7 @@ in {
 
   hypothesis = if isPy3k then callPackage ../development/python-modules/hypothesis { } else self.hypothesis_4;
 
-  hypothesmith = callPackage ../development/python-modules/hypothesmith {
-    libcst = self.libcst.override { doCheck = false; };
-  };
+  hypothesmith = callPackage ../development/python-modules/hypothesmith { };
 
   hyppo = callPackage ../development/python-modules/hyppo { };
 
@@ -3926,6 +3938,8 @@ in {
   ludios_wpull = callPackage ../development/python-modules/ludios_wpull { };
 
   luftdaten = callPackage ../development/python-modules/luftdaten { };
+
+  lupa = callPackage ../development/python-modules/lupa { };
 
   lxc = callPackage ../development/python-modules/lxc { };
 
@@ -6354,7 +6368,9 @@ in {
   pytest-runner = self.pytestrunner; # added 2021-01-04
   pytestrunner = callPackage ../development/python-modules/pytestrunner { };
 
-  pytest-sanic = callPackage ../development/python-modules/pytest-sanic { };
+  pytest-sanic = callPackage ../development/python-modules/pytest-sanic {
+    sanic = self.sanic.override { doCheck = false; };
+  };
 
   pytest-server-fixtures = callPackage ../development/python-modules/pytest-server-fixtures { };
 
@@ -8350,7 +8366,10 @@ in {
 
   varint = callPackage ../development/python-modules/varint { };
 
-  vcrpy = callPackage ../development/python-modules/vcrpy { };
+  vcrpy = if isPy27 then
+    callPackage ../development/python-modules/vcrpy/3.nix { }
+  else
+    callPackage ../development/python-modules/vcrpy { };
 
   vcver = callPackage ../development/python-modules/vcver { };
 
@@ -8466,7 +8485,9 @@ in {
 
   wasmer = callPackage ../development/python-modules/wasmer { };
 
-  watchdog = callPackage ../development/python-modules/watchdog { };
+  watchdog = callPackage ../development/python-modules/watchdog {
+    inherit (pkgs.darwin.apple_sdk.frameworks) CoreServices;
+  };
 
   waterfurnace = callPackage ../development/python-modules/waterfurnace { };
 

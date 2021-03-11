@@ -656,7 +656,7 @@ self: super: {
   });
 
   lf-vim = super.lf-vim.overrideAttrs (old: {
-    dependencies = with super; [ vim-bbye ];
+    dependencies = with super; [ vim-floaterm ];
   });
 
   vim-stylish-haskell = super.vim-stylish-haskell.overrideAttrs (old: {
@@ -729,7 +729,7 @@ self: super: {
             libiconv
           ];
 
-          cargoSha256 = "042dbg80mx0khm8xahm4l490s7bfbav362r0mz5bfhq4fy2s9nsi";
+          cargoSha256 = "F+kIVnO7MBuaYRa2MPsD3eQ2d5W5VxHhxHKeo/ic6TE=";
         };
       in
       ''
