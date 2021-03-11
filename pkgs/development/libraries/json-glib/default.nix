@@ -6,9 +6,9 @@
 , ninja
 , pkg-config
 , gettext
-, gobject-introspection
+#, gobject-introspection
 , fixDarwinDylibNames
-, gtk-doc
+#, gtk-doc
 , docbook-xsl-nons
 , docbook_xml_dtd_43
 , gnome3
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   pname = "json-glib";
   version = "1.6.2";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = [ "out" "dev" ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -30,9 +30,9 @@ stdenv.mkDerivation rec {
     ninja
     pkg-config
     gettext
-    gobject-introspection
+    #gobject-introspection
     glib
-    gtk-doc
+    #gtk-doc
     docbook-xsl-nons
     docbook_xml_dtd_43
   ] ++ lib.optional stdenv.hostPlatform.isDarwin [
@@ -44,6 +44,11 @@ stdenv.mkDerivation rec {
   ];
 
   doCheck = true;
+
+  mesonFlags = [
+    "-Dintrospection=disabled"
+    "-Dgtk_doc=disabled"
+  ];
 
   passthru = {
     updateScript = gnome3.updateScript {
