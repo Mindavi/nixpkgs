@@ -64,7 +64,7 @@ self: super: {
       name = "git-annex-${super.git-annex.version}-src";
       url = "git://git-annex.branchable.com/";
       rev = "refs/tags/" + super.git-annex.version;
-      sha256 = "1m9jfr5b0qwajwwmvcq02263bmnqgcqvpdr06sdwlfz3sxsjfp8r";
+      sha256 = "1lvl6i3ym7dyg215fkmslf3rnk29hz7f21jn91y1mghrhch7hvhl";
     };
   }).override {
     dbus = if pkgs.stdenv.isLinux then self.dbus else null;
@@ -212,31 +212,11 @@ self: super: {
   # base bound
   digit = doJailbreak super.digit;
 
-  # 2020-06-05: HACK: does not pass own build suite - `dontCheck` We should
-  # generate optparse-applicative completions for the hnix executable.  Sadly
-  # building of the executable has been disabled for ghc < 8.10 in hnix.
-  # Generating the completions should be activated again, once we default to
-  # ghc 8.10.
-  hnix = dontCheck (super.hnix.override {
-
-    #  2021-01-07: NOTE: hnix-store-core pinned at ==0.2 in Stackage Nightly.
-    # https://github.com/haskell-nix/hnix-store/issues/104
-    # Until unpin, which may hold off in time due to Stackage maintenence bottleneck
-    # the 0_4_0_0 is used
-    hnix-store-core = self.hnix-store-core_0_4_1_0; # at least 1.7
-
-  });
-
-  #  2021-01-07: NOTE: hnix-store-core pinned at ==0.2 in Stackage Nightly.
-  # https://github.com/haskell-nix/hnix-store/issues/104
-  # Until unpin, which may hold off in time due to Stackage maintenence bottleneck
-  # the 0_4_0_0 is used
-  hnix-store-remote = (super.hnix-store-remote.override {
-    hnix-store-core = self.hnix-store-core_0_4_1_0; # at least 1.7
-  });
+  # 2020-06-05: HACK: does not pass own build suite - `dontCheck`
+  hnix = generateOptparseApplicativeCompletion "hnix" (dontCheck super.hnix);
 
   # https://github.com/haskell-nix/hnix-store/issues/127
-  hnix-store-core_0_4_1_0 = addTestToolDepend super.hnix-store-core_0_4_1_0 self.tasty-discover;
+  hnix-store-core = addTestToolDepend super.hnix-store-core self.tasty-discover;
 
   # Fails for non-obvious reasons while attempting to use doctest.
   search = dontCheck super.search;
@@ -684,8 +664,26 @@ self: super: {
     '';
   });
 
-  # The standard libraries are compiled separately.
-  idris = generateOptparseApplicativeCompletion "idris" (dontCheck super.idris);
+  # * The standard libraries are compiled separately.
+  # * We need multiple patches from master to fix compilation with
+  #   updated dependencies (haskeline and megaparsec) which can be
+  #   removed when the next idris release (1.3.4 probably) comes
+  #   around.
+  idris = generateOptparseApplicativeCompletion "idris"
+    (doJailbreak (dontCheck
+      (appendPatches super.idris [
+        # compatibility with haskeline >= 0.8
+        (pkgs.fetchpatch {
+          url = "https://github.com/idris-lang/Idris-dev/commit/89a87cf666eb8b27190c779e72d0d76eadc1bc14.patch";
+          sha256 = "0fv493zlpgjsf57w0sncd4vqfkabfczp3xazjjmqw54m9rsfix35";
+        })
+        # compatibility with megaparsec >= 0.9
+        (pkgs.fetchpatch {
+          url = "https://github.com/idris-lang/Idris-dev/commit/6ea9bc913877d765048d7cdb7fc5aec60b196fac.patch";
+          sha256 = "0yms74d1xdxd1c08dnp45nb1ddzq54n6hqgzxx0r494wy614ir8q";
+        })
+      ])
+    ));
 
   # https://github.com/pontarius/pontarius-xmpp/issues/105
   pontarius-xmpp = dontCheck super.pontarius-xmpp;
@@ -845,8 +843,11 @@ self: super: {
   # https://github.com/alphaHeavy/protobuf/issues/34
   protobuf = dontCheck super.protobuf;
 
-  # https://github.com/bos/text-icu/issues/32
-  text-icu = dontCheck super.text-icu;
+  # Is this package still maintained? https://github.com/haskell/text-icu/issues/30
+  text-icu = overrideCabal super.text-icu (drv: {
+    doCheck = false;                                               # https://github.com/bos/text-icu/issues/32
+    configureFlags = ["--ghc-option=-DU_DEFINE_FALSE_AND_TRUE=1"]; # https://github.com/haskell/text-icu/issues/49
+  });
 
   # aarch64 and armv7l fixes.
   happy = if (pkgs.stdenv.hostPlatform.isAarch32 || pkgs.stdenv.hostPlatform.isAarch64) then dontCheck super.happy else super.happy; # Similar to https://ghc.haskell.org/trac/ghc/ticket/13062
@@ -968,8 +969,10 @@ self: super: {
   # musl fixes
   # dontCheck: use of non-standard strptime "%s" which musl doesn't support; only used in test
   unix-time = if pkgs.stdenv.hostPlatform.isMusl then dontCheck super.unix-time else super.unix-time;
-  # dontCheck: printf double rounding behavior
-  prettyprinter = if pkgs.stdenv.hostPlatform.isMusl then dontCheck super.prettyprinter else super.prettyprinter;
+
+  # The test suite runs for 20+ minutes on a very fast machine, which feels kinda disproportionate.
+  prettyprinter = dontCheck super.prettyprinter;
+  brittany = doJailbreak (dontCheck super.brittany);  # Outdated upperbound on ghc-exactprint: https://github.com/lspitzner/brittany/issues/342
 
   # Fix with Cabal 2.2, https://github.com/guillaume-nargeot/hpc-coveralls/pull/73
   hpc-coveralls = appendPatch super.hpc-coveralls (pkgs.fetchpatch {
@@ -1405,28 +1408,23 @@ self: super: {
   # quickcheck-instances is only used in the tests of binary-instances.
   binary-instances = dontCheck super.binary-instances;
 
-  # tons of overrides for bleeding edge versions for ghcide and hls
-  # overriding aeson on all of them to prevent double compilations
-  # this shouldn‘t break anything because nearly all their reverse deps are
-  # in this list or marked as broken anyways
   # 2020-11-19: Checks nearly fixed, but still disabled because of flaky tests:
   # https://github.com/haskell/haskell-language-server/issues/610
   # https://github.com/haskell/haskell-language-server/issues/611
-  haskell-language-server = dontCheck (super.haskell-language-server.override {
-    lsp-test = dontCheck self.lsp-test;
-    fourmolu = self.fourmolu_0_3_0_0;
-  });
-  # 2021-01-20
-  # apply-refact 0.9.0.0 get's a build error with hls-hlint-plugin 0.8.0
-  # https://github.com/haskell/haskell-language-server/issues/1240
-  apply-refact = super.apply-refact_0_8_2_1;
+  haskell-language-server = dontCheck super.haskell-language-server;
 
-  fourmolu = dontCheck super.fourmolu;
+  # 2021-02-11: Jailbreaking because of syntax error on bound revision
+  hls-explicit-imports-plugin = doJailbreak super.hls-explicit-imports-plugin;
+
+  # 2021-02-08: Overrides because nightly is to old for hls 0.9.0
+  lsp-test = doDistribute (dontCheck self.lsp-test_0_11_0_7);
+  haskell-lsp = doDistribute self.haskell-lsp_0_23_0_0;
+  haskell-lsp-types = doDistribute self.haskell-lsp-types_0_23_0_0;
 
   # 1. test requires internet
   # 2. dependency shake-bench hasn't been published yet so we also need unmarkBroken and doDistribute
-  ghcide = doDistribute (unmarkBroken (dontCheck (super.ghcide_0_7_0_0.override { lsp-test = dontCheck self.lsp-test; })));
-  refinery = doDistribute super.refinery_0_3_0_0;
+  ghcide = doDistribute (unmarkBroken (dontCheck super.ghcide));
+
   data-tree-print = doJailbreak super.data-tree-print;
 
   # 2020-11-15: aeson 1.5.4.1 needs to new quickcheck-instances for testing
@@ -1489,13 +1487,6 @@ self: super: {
   # Due to tests restricting base in 0.8.0.0 release
   http-media = doJailbreak super.http-media;
 
-  # Use an already merged upstream patch fixing the build with primitive >= 0.7.2
-  # The version bounds were correctly specified before, so we need to jailbreak as well
-  streamly = appendPatch (doJailbreak super.streamly) (pkgs.fetchpatch {
-    url = "https://github.com/composewell/streamly/commit/2c88cb631fdcb5c0d3a8bc936e1e63835800be9b.patch";
-    sha256 = "0g2m0y46zr3xs9fswkm4h9adhsg6gzl5zwgidshsjh3k3rq4h7b1";
-  });
-
   # https://github.com/ekmett/half/issues/35
   half = if pkgs.stdenv.isAarch64
     then dontCheck super.half
@@ -1503,6 +1494,8 @@ self: super: {
 
   # 2020-11-19: Jailbreaking until: https://github.com/snapframework/heist/pull/124
   heist = doJailbreak super.heist;
+
+  hinit = generateOptparseApplicativeCompletion "hi" (super.hinit.override { haskeline = self.haskeline_0_8_1_1; });
 
   # 2020-11-19: Jailbreaking until: https://github.com/snapframework/snap/pull/219
   snap = doJailbreak super.snap;
@@ -1527,7 +1520,7 @@ self: super: {
 
   # 2020-12-05: http-client is fixed on too old version
   essence-of-live-coding-warp = super.essence-of-live-coding-warp.override {
-    http-client = self.http-client_0_7_4;
+    http-client = self.http-client_0_7_6;
   };
 
   # 2020-12-06: Restrictive upper bounds w.r.t. pandoc-types (https://github.com/owickstrom/pandoc-include-code/issues/27)
@@ -1574,5 +1567,39 @@ self: super: {
 
   # Allow building with older versions of http-client.
   http-client-restricted = doJailbreak super.http-client-restricted;
+
+  # 2020-02-11: https://github.com/ekmett/lens/issues/969
+  # A change in vector 0.2.12 broke the lens doctests.
+  # This is fixed on lens master. Remove this override on assert fail.
+  lens = assert super.lens.version == "4.19.2"; doJailbreak (dontCheck super.lens);
+
+  # Test suite fails, upstream not reachable for simple fix (not responsive on github)
+  vivid-osc = dontCheck super.vivid-osc;
+  vivid-supercollider = dontCheck super.vivid-supercollider;
+
+  # Overly strict version bounds: https://github.com/Profpatsch/yarn-lock/issues/8
+  yarn-lock = doJailbreak super.yarn-lock;
+
+  # Dependency to regex-tdfa-text can be removed for later regex-tdfa versions.
+  # Fix protolude compilation error by applying patch from pull-request.
+  # Override can be removed for the next release > 0.8.0.
+  yarn2nix = overrideCabal (super.yarn2nix.override {
+    regex-tdfa-text = null;
+  }) (attrs: {
+    jailbreak = true;
+    # remove dependency on regex-tdfa-text
+    # which has been merged into regex-tdfa
+    postPatch = ''
+      sed -i '/regex-tdfa-text/d' yarn2nix.cabal
+    '';
+    patches = (attrs.patches or []) ++ [
+      # fix a compilation error related to protolude 0.3
+      (pkgs.fetchpatch {
+        url = "https://github.com/Profpatsch/yarn2nix/commit/ca78cf06226819b2e78cb6cdbc157d27afb41532.patch";
+        sha256 = "1vkczwzhxilnp87apyb18nycn834y5nbw4yr1kpwlwhrhalvzw61";
+        includes = [ "*/ResolveLockfile.hs" ];
+      })
+    ];
+  });
 
 } // import ./configuration-tensorflow.nix {inherit pkgs haskellLib;} self super

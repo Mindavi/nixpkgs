@@ -96,11 +96,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "appgate-sdp";
-  version = "5.3.2";
+  version = "5.3.3";
 
   src = fetchurl {
     url = "https://bin.appgate-sdp.com/${lib.versions.majorMinor version}/client/appgate-sdp_${version}_amd64.deb";
-    sha256 = "123d4mx2nsh8q3ckm4g2chdcdwgg0cz9cvhiwjggxzvy7j6bqgy4";
+    sha256 = "1854m93mr2crg68zhh1pgwwis0dqdv0778wqrb8dz9sdz940rza8";
   };
 
   dontConfigure = true;
@@ -133,7 +133,7 @@ stdenv.mkDerivation rec {
         --replace "/bin/sh" "${bash}/bin/sh" \
         --replace "cat" "${coreutils}/bin/cat" \
         --replace "chattr" "${e2fsprogs}/bin/chattr" \
-        --replace "mv" "${coreutils}/bin/mv" \
+        --replace "mv " "${coreutils}/bin/mv " \
         --replace "pkill" "${procps}/bin/pkill"
     done
 
@@ -145,7 +145,7 @@ stdenv.mkDerivation rec {
         --replace "/bin/sh" "${bash}/bin/sh" \
         --replace "/opt/" "$out/opt/" \
         --replace "chattr" "${e2fsprogs}/bin/chattr" \
-        --replace "mv" "${coreutils}/bin/mv"
+        --replace "mv " "${coreutils}/bin/mv "
     done
 
     substituteInPlace $out/lib/systemd/system/appgatedriver.service \
@@ -174,7 +174,7 @@ stdenv.mkDerivation rec {
   '';
   meta = with lib; {
     description = "Appgate SDP (Software Defined Perimeter) desktop client";
-    homepage = https://www.appgate.com/support/software-defined-perimeter-support;
+    homepage = "https://www.appgate.com/support/software-defined-perimeter-support";
     license = licenses.unfree;
     platforms = platforms.linux;
     maintainers = with maintainers; [ ymatsiuk ];

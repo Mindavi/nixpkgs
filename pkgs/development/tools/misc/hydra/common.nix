@@ -1,11 +1,11 @@
-{ stdenv, nix, perlPackages, buildEnv, fetchFromGitHub
+{ stdenv, nix, perlPackages, buildEnv
 , makeWrapper, autoconf, automake, libtool, unzip, pkg-config, sqlite, libpqxx
 , top-git, mercurial, darcs, subversion, breezy, openssl, bzip2, libxslt
-, guile, perl, postgresql, nukeReferences, git, boehmgc, nlohmann_json
+, perl, postgresql, nukeReferences, git, boehmgc, nlohmann_json
 , docbook_xsl, openssh, gnused, coreutils, findutils, gzip, lzma, gnutar
 , rpm, dpkg, cdrkit, pixz, lib, boost, autoreconfHook, src ? null, version ? null
 , migration ? false, patches ? []
-, tests ? {}
+, tests ? {}, mdbook
 }:
 
 with stdenv;
@@ -92,7 +92,7 @@ in stdenv.mkDerivation rec {
       gzip bzip2 lzma gnutar unzip git top-git mercurial /*darcs*/ gnused breezy
     ] ++ lib.optionals stdenv.isLinux [ rpm dpkg cdrkit ] );
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ];
+  nativeBuildInputs = [ autoreconfHook pkg-config mdbook ];
 
   configureFlags = [ "--with-docbook-xsl=${docbook_xsl}/xml/xsl/docbook" ];
 

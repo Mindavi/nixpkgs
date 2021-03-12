@@ -298,7 +298,10 @@ stdenv.mkDerivation {
     # vs libstdc++, etc.) since Darwin isn't `useLLVM` on all counts. (See
     # https://clang.llvm.org/docs/Toolchain.html for all the axes one might
     # break `useLLVM` into.)
-    + optionalString (isClang && gccForLibs != null && targetPlatform.isLinux && !(stdenv.targetPlatform.useLLVM or false)) ''
+    + optionalString (isClang && gccForLibs != null
+                      && targetPlatform.isLinux
+                      && !(stdenv.targetPlatform.useAndroidPrebuilt or false)
+                      && !(stdenv.targetPlatform.useLLVM or false)) ''
       echo "--gcc-toolchain=${gccForLibs}" >> $out/nix-support/cc-cflags
     ''
 
@@ -451,6 +454,8 @@ stdenv.mkDerivation {
       hardening_unsupported_flags+=" stackprotector pic"
     '' + optionalString (targetPlatform.libc == "newlib") ''
       hardening_unsupported_flags+=" stackprotector fortify pie pic"
+    '' + optionalString (targetPlatform.libc == "musl" && targetPlatform.isx86_32) ''
+      hardening_unsupported_flags+=" stackprotector"
     '' + optionalString targetPlatform.isNetBSD ''
       hardening_unsupported_flags+=" stackprotector fortify"
     '' + optionalString cc.langAda or false ''

@@ -84,7 +84,10 @@ let
     qtscript = [ ./qtscript.patch ];
     qtserialport = [ ./qtserialport.patch ];
     qtwebengine = [ ]
-      ++ optional stdenv.isDarwin ./qtwebengine-darwin-no-platform-check.patch;
+      ++ optionals stdenv.isDarwin [
+        ./qtwebengine-darwin-no-platform-check.patch
+        ./qtwebengine-mac-dont-set-dsymutil-path.patch
+      ];
     qtwebkit = [
       (fetchpatch {
         name = "qtwebkit-bison-3.7-build.patch";
@@ -92,6 +95,7 @@ let
         sha256 = "0h8ymfnwgkjkwaankr3iifiscsvngqpwb91yygndx344qdiw9y0n";
       })
       ./qtwebkit.patch
+      ./qtwebkit-icu68.patch
     ] ++ optionals stdenv.isDarwin [
       ./qtwebkit-darwin-no-readline.patch
       ./qtwebkit-darwin-no-qos-classes.patch
@@ -179,6 +183,7 @@ let
       qmake = makeSetupHook {
         deps = [ self.qtbase.dev ];
         substitutions = {
+          inherit debug;
           fix_qmake_libtool = ../hooks/fix-qmake-libtool.sh;
         };
       } ../hooks/qmake-hook.sh;

@@ -2,22 +2,23 @@
 
 buildGoModule rec {
   pname = "operator-sdk";
-  version = "1.3.0";
+  version = "1.4.2";
 
   src = fetchFromGitHub {
     owner = "operator-framework";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-xYG605Z8WGFH5byJA+sHPBjBmWi8b+TTtWRnQnmYN/4=";
+    sha256 = "sha256-wGlxi9X8RrAtvevDfufY1t3en6QgHy5XoSh0K/M/ve4=";
   };
 
-  vendorSha256 = "sha256-0ZowddIiVHVg1OKhaCFo+vQKcUe6wZ6L0J8RdMvZyGk=";
+  vendorSha256 = "sha256-GRw0u6zox2gseQhrx7n0M3WVu4+yCKZ7D/QHVcBRb30=";
 
   doCheck = false;
 
   subPackages = [ "cmd/operator-sdk" ];
 
-  buildInputs = [ go makeWrapper ];
+  nativeBuildInputs = [ makeWrapper ];
+  buildInputs = [ go ];
 
   # operator-sdk uses the go compiler at runtime
   allowGoReference = true;

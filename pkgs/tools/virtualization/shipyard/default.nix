@@ -2,15 +2,15 @@
 
 buildGoModule rec {
   pname = "shipyard";
-  version = "0.1.17";
+  version = "0.2.9";
 
   src = fetchFromGitHub {
     rev = "v${version}";
     owner = "shipyard-run";
     repo = pname;
-    sha256 = "13cp7qpxchnyxdm26xwdcp557nj16f4h8vlj0p4h79z5g7pcklln";
+    sha256 = "sha256-S2nH1E20frsJzW2RCn+eJ9ylVdhVbo4wesNwlQll9S4=";
   };
-  vendorSha256 = "0gib9s09lz91wawbms9zq4wc5k6bdxfzpxm8q92h0bsjw1bj1hzs";
+  vendorSha256 = "sha256-rglpY7A0S56slL+mXFRgaZwS0bF1b9zxxmNYiX6TJzs=";
 
   buildFlagsArray = [
     "-ldflags=-s -w -X main.version=${version}"

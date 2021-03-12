@@ -53,7 +53,8 @@ let
   dynamicLinker =
     /**/ if libc == null then null
     else if targetPlatform.libc == "musl"             then "${libc_lib}/lib/ld-musl-*"
-    else if targetPlatform.libc == "bionic"           then "/system/bin/linker"
+    else if (targetPlatform.libc == "bionic" && targetPlatform.is32bit) then "/system/bin/linker"
+    else if (targetPlatform.libc == "bionic" && targetPlatform.is64bit) then "/system/bin/linker64"
     else if targetPlatform.libc == "nblibc"           then "${libc_lib}/libexec/ld.elf_so"
     else if targetPlatform.system == "i686-linux"     then "${libc_lib}/lib/ld-linux.so.2"
     else if targetPlatform.system == "x86_64-linux"   then "${libc_lib}/lib/ld-linux-x86-64.so.2"
@@ -64,6 +65,7 @@ let
     else if targetPlatform.system == "powerpc-linux"  then "${libc_lib}/lib/ld.so.1"
     else if targetPlatform.isMips                     then "${libc_lib}/lib/ld.so.1"
     else if targetPlatform.isDarwin                   then "/usr/lib/dyld"
+    else if targetPlatform.isFreeBSD                  then "/libexec/ld-elf.so.1"
     else if lib.hasSuffix "pc-gnu" targetPlatform.config then "ld.so.1"
     else null;
 

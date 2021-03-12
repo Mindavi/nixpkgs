@@ -1,6 +1,6 @@
 { pname, ffversion, meta, updateScript ? null
 , src, unpackPhase ? null, patches ? []
-, extraNativeBuildInputs ? [], extraConfigureFlags ? [], extraMakeFlags ? [] }:
+, extraNativeBuildInputs ? [], extraConfigureFlags ? [], extraMakeFlags ? [], tests ? [] }:
 
 { lib, stdenv, pkg-config, pango, perl, python3, zip
 , libjpeg, zlib, dbus, dbus-glib, bzip2, xorg
@@ -8,7 +8,7 @@
 , yasm, libGLU, libGL, sqlite, unzip, makeWrapper
 , hunspell, libXdamage, libevent, libstartup_notification
 , libvpx_1_8
-, icu67, libpng, jemalloc, glib
+, icu67, libpng, jemalloc, glib, pciutils
 , autoconf213, which, gnused, rustPackages, rustPackages_1_45
 , rust-cbindgen, nodejs, nasm, fetchpatch
 , gnum4
@@ -23,7 +23,7 @@
 , ffmpegSupport ? true
 , gtk3Support ? true, gtk2, gtk3, wrapGAppsHook
 , waylandSupport ? true, libxkbcommon
-, ltoSupport ? stdenv.isLinux, overrideCC, buildPackages
+, ltoSupport ? (stdenv.isLinux && stdenv.is64bit), overrideCC, buildPackages
 , gssSupport ? true, kerberos
 , pipewireSupport ? waylandSupport && webrtcSupport, pipewire
 
@@ -111,6 +111,13 @@ let
                 else stdenv;
 
   nss_pkg = if lib.versionOlder ffversion "83" then nss_3_53 else nss;
+
+  # --enable-release adds -ffunction-sections & LTO that require a big amount of
+  # RAM and the 32-bit memory space cannot handle that linking
+  # We also disable adding "-g" for easier linking
+  releaseFlags = if stdenv.is32bit
+                 then [ "--disable-release" "--disable-debug-symbols" ]
+                 else [ "--enable-release" ];
 in
 
 buildStdenv.mkDerivation ({
@@ -182,6 +189,8 @@ buildStdenv.mkDerivation ({
 
   postPatch = ''
     rm -rf obj-x86_64-pc-linux-gnu
+    substituteInPlace toolkit/xre/glxtest.cpp \
+      --replace 'dlopen("libpci.so' 'dlopen("${pciutils}/lib/libpci.so'
   '' + lib.optionalString (pipewireSupport && lib.versionOlder ffversion "83") ''
     # substitute the /usr/include/ lines for the libraries that pipewire provides.
     # The patch we pick from fedora only contains the generated moz.build files
@@ -294,9 +303,9 @@ buildStdenv.mkDerivation ({
   ++ lib.optional drmSupport "--enable-eme=widevine"
 
   ++ (if debugBuild then [ "--enable-debug" "--enable-profiling" ]
-                    else [ "--disable-debug" "--enable-release"
+                    else ([ "--disable-debug"
                            "--enable-optimize"
-                           "--enable-strip" ])
+                           "--enable-strip" ] ++ releaseFlags))
   ++ lib.optional enableOfficialBranding "--enable-official-branding"
   ++ extraConfigureFlags;
 
@@ -351,6 +360,7 @@ buildStdenv.mkDerivation ({
     inherit gssSupport;
     inherit execdir;
     inherit browserName;
+    inherit tests;
   } // lib.optionalAttrs gtk3Support { inherit gtk3; };
 
   hardeningDisable = [ "format" ]; # -Werror=format-security

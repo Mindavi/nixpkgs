@@ -117,7 +117,7 @@ let
         else
           lib.appendToName "with-plugins" (stdenv.mkDerivation {
             inherit (terraform) name meta;
-            buildInputs = [ makeWrapper ];
+            nativeBuildInputs = [ makeWrapper ];
 
             buildCommand = pluginDir + ''
               mkdir -p $out/bin/
@@ -157,9 +157,9 @@ in rec {
   });
 
   terraform_0_14 = pluggable (generic {
-    version = "0.14.5";
-    sha256 = "0drf049zghpm3ajrn006w621s7bw5r1s8gl77nd1cj2zcw2nzn1r";
-    vendorSha256 = "0z9mkilazrkpbccnkws4hcc49djdwzn0cdbgqkm9bnp9fyg3rfvs";
+    version = "0.14.8";
+    sha256 = "0kpw8w28pfyr136z5d4pxw7g9ch6rk2lfwh3lwz25mngq1lljmn0";
+    vendorSha256 = "1d93aqkjdrvabkvix6h1qaxpjzv7w1wa7xa44czdnjs2lapx4smm";
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
   });

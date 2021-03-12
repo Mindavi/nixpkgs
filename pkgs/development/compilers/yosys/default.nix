@@ -33,13 +33,13 @@
 
 stdenv.mkDerivation rec {
   pname   = "yosys";
-  version = "0.9+3830";
+  version = "0.9+3962";
 
   src = fetchFromGitHub {
     owner  = "YosysHQ";
     repo   = "yosys";
-    rev    = "b72c29465392c8d260ddf55def169438f7fb64b2";
-    sha256 = "12h3pgj8bjb254q2qaafc3qxwhqdqrx0sxjhgjrfy8cmkdm92dvy";
+    rev    = "5d0cc54f5c36dea1d989438426a321b4554257c8";
+    sha256 = "1c85kga95lin6rcpr7cf80wr9f1a6irdrld9g23zmqdrxhick8y7";
   };
 
   enableParallelBuilding = true;
@@ -103,5 +103,12 @@ stdenv.mkDerivation rec {
     license     = licenses.isc;
     platforms   = platforms.all;
     maintainers = with maintainers; [ shell thoughtpolice emily ];
+    #In file included from kernel/driver.cc:20:
+    #./kernel/yosys.h:42:10: fatal error: 'map' file not found
+    ##include <map>
+
+    #https://github.com/YosysHQ/yosys/issues/681
+    #https://github.com/YosysHQ/yosys/issues/2011
+    broken = stdenv.isDarwin;
   };
 }

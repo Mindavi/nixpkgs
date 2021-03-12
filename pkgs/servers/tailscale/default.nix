@@ -2,21 +2,20 @@
 
 buildGoModule rec {
   pname = "tailscale";
-  version = "1.4.1";
-  tagHash = "6e7df630dec919ce41099ea12ab5f5d05354d303"; # from `git rev-parse v1.4.1`
+  version = "1.4.5";
 
   src = fetchFromGitHub {
     owner = "tailscale";
     repo = "tailscale";
     rev = "v${version}";
-    sha256 = "1sfvsp9zf45rwfgia1jdymkanyys7x6wlnkq64w98jml8zsnn8yj";
+    sha256 = "sha256-PMBlvres95UIbd3uqZWPE3OzyrEAGEXit/Z7X1p46GY=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
 
   CGO_ENABLED = 0;
 
-  vendorSha256 = "16aa7jc2h59hnnh0mfmnd0k198dijm9j4c44j80wpzlhf4x27yjs";
+  vendorSha256 = "sha256-WvojOnGQ/ssBkoQwIlOVsaEUJmi2ugqgtTAVKJg8Spk=";
 
   doCheck = false;
 
@@ -25,7 +24,7 @@ buildGoModule rec {
   preBuild = ''
     export buildFlagsArray=(
       -tags="xversion"
-      -ldflags="-X tailscale.com/version.Long=${version} -X tailscale.com/version.Short=${version} -X tailscale.com/version.GitCommit=${tagHash}"
+      -ldflags="-X tailscale.com/version.Long=${version} -X tailscale.com/version.Short=${version}"
     )
   '';
 
