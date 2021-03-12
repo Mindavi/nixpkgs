@@ -28,6 +28,16 @@ stdenv.mkDerivation {
     })
   ];
 
+  postPatch = ''
+    substituteInPlace Makefile \
+      --replace "CC=" "CC?=" \
+      --replace "AR=" "AR?="
+    substituteInPlace librtmp/Makefile \
+      --replace "CC=" "CC?=" \
+      --replace "AR=" "AR?=" \
+      --replace "LD=" "LD?="
+  '';
+
   makeFlags = [ "prefix=$(out)" ]
     ++ optional gnutlsSupport "CRYPTO=GNUTLS"
     ++ optional opensslSupport "CRYPTO=OPENSSL"
