@@ -65,7 +65,15 @@ stdenv.mkDerivation rec {
     sha256 = "16xv6ambc82g14h1y0q1vyy57wp6j9fbp0nk0wd5csnrw407rhry";
   };
 
-  postPatch = "patchShebangs .";
+  postPatch = ''
+    patchShebangs .
+  '' + lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
+    # Some compilers (such as gcc for aarch64) don't understand these flags.
+    substituteInPlace configure \
+      --replace "-Wparentheses-equality" "-Wall" \
+      --replace "-Wshorten-64-to-32" "-Wall" \
+      --replace "-Wunreachable-code-loop-increment" "-Wall"
+  '';
 
   outputs = [ "bin" "dev" "out" ];
   setOutputFlags = false;
