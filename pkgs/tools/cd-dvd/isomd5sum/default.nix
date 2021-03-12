@@ -14,6 +14,7 @@ stdenv.mkDerivation rec {
     sha256 = "1wjnh2hlp1hjjm4a8wzdhdrm73jq41lmpmy3ls0rh715p3j7z4q9";
   };
 
+  nativeBuildInputs = [ python3 ];
   buildInputs = [ python3 popt ] ;
 
   postPatch = ''
