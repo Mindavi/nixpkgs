@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, meson, ninja, glib, pkg-config, udev, libgudev, doxygen }:
+{ lib, stdenv, fetchFromGitHub, meson, ninja, glib, pkg-config, udev, libgudev, doxygen, gcc }:
 
 stdenv.mkDerivation rec {
   pname = "libwacom";
@@ -13,11 +13,16 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-vkBkOE4aVX/6xKjslkqlZkh5jdYVEawvvBLpj8PpuiA=";
   };
 
+  depsBuildBuild = [ pkg-config glib libgudev gcc ];
   nativeBuildInputs = [ pkg-config meson ninja doxygen ];
 
   mesonFlags = [ "-Dtests=disabled" ];
 
   buildInputs = [ glib udev libgudev ];
+
+  patches = [
+    ./generate-hwdb-native2.patch
+  ];
 
   meta = with lib; {
     platforms = platforms.linux;
