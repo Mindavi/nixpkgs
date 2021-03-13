@@ -20,6 +20,12 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-YDGVxktzE3YJsH4QJK4LN/ZSsvX+Rn3OZphbPRhQBQw=";
   };
 
+  patches = [
+    # Required for cross-compilation.
+    # Picked from https://github.com/NixOS/nixpkgs/pull/91422 by betaboon.
+    ./makefile-defaults.patch
+  ];
+
   postPatch = lib.optionalString stdenv.hostPlatform.isLinux ''
     sed '1i#include <linux/sockios.h>' -i src/dhcp.c
   '';
