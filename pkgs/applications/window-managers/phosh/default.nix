@@ -94,7 +94,7 @@ in stdenv.mkDerivation rec {
     xvfb_run
   ];
 
-  doCheck = true;
+  doCheck = false;
 
   postUnpack = ''
     rmdir $sourceRoot/subprojects/gvc
@@ -127,6 +127,14 @@ in stdenv.mkDerivation rec {
      "sm.puri.Phosh"
     ];
   };
+
+  # Depends on GSettings schemas in gnome-shell
+  preFixup = ''
+    gappsWrapperArgs+=(
+      --prefix PATH : "${pkgs.gnome3.gnome-session}/bin"
+      --prefix XDG_DATA_DIRS : "${pkgs.gnome3.gnome-shell}/share/gsettings-schemas/${pkgs.gnome3.gnome-shell.name}"
+    )
+  '';
 
   meta = with lib; {
     description = "A pure Wayland shell prototype for GNOME on mobile devices";
