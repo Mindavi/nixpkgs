@@ -19,6 +19,8 @@ stdenv.mkDerivation rec {
       --replace "/usr/include/python" "${pythonIncludePath}"
     substituteInPlace configure.ac \
       --replace "/usr/include/python" "${pythonIncludePath}"
+    substituteInPlace Makefile.in \
+      --replace "ar rv" "\$(AR) rv"
   '';
 
   buildInputs = [ slang popt python ];
@@ -33,6 +35,7 @@ stdenv.mkDerivation rec {
 
   makeFlags = lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     "CROSS_COMPILE=${stdenv.cc.targetPrefix}"
+    "AR:=$(AR)"
   ];
 
   meta = with lib; {
