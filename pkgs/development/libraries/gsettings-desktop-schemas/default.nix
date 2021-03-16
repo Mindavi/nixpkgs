@@ -25,12 +25,12 @@ stdenv.mkDerivation rec {
     ninja
     pkg-config
     python3
-  ];
-
-  buildInputs = [
     glib
-    gobject-introspection
-  ];
+  ] ++ lib.optional (stdenv.buildPlatform == stdenv.targetPlatform) gobject-introspection;
+
+  buildInputs = [];
+
+  mesonFlags = lib.optional (stdenv.buildPlatform != stdenv.targetPlatform) "-Dintrospection=false";
 
   postPatch = ''
     chmod +x build-aux/meson/post-install.py
