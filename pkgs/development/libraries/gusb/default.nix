@@ -22,6 +22,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     meson ninja pkg-config gettext pythonEnv
     gtk-doc docbook_xsl docbook_xml_dtd_412 docbook_xml_dtd_44
+  ] ++ lib.optionals (stdenv.buildPlatform == stdenv.targetPlatform) [
     gobject-introspection vala
   ];
   buildInputs = [ systemd glib ];
@@ -30,6 +31,9 @@ stdenv.mkDerivation rec {
 
   mesonFlags = [
     "-Dusb_ids=${hwdata}/share/hwdata/usb.ids"
+  ] ++ lib.optionals (stdenv.buildPlatform != stdenv.targetPlatform) [
+    "-Dintrospection=false"
+    "-Dvapi=false"
   ];
 
   doCheck = false; # tests try to access USB
