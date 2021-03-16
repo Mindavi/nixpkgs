@@ -27,16 +27,15 @@ stdenv.mkDerivation rec {
     "-Dtests=false"
     "-Ddocbook_docs=disabled"
     "-Dgtk_doc=false"
-  ];
+  ] ++ lib.optional (stdenv.buildPlatform != stdenv.targetPlatform) "-Dintrospection=disabled";
 
   nativeBuildInputs = [
-    gobject-introspection
     meson
     ninja
     pkg-config
     libxslt
     docbook-xsl-ns
-  ];
+  ] ++ lib.optional (stdenv.buildPlatform == stdenv.targetPlatform) gobject-introspection;
 
   propagatedBuildInputs = [
     gdk-pixbuf
