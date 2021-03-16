@@ -36,6 +36,7 @@ stdenv.mkDerivation rec {
     "--enable-early-chroot"
     "--sysconfdir=/etc"
     "--localstatedir=/var"
+    "BUILD_CC=${buildPackages.stdenv.cc.targetPrefix}cc"
   ] ++ lib.optional stdenv.isLinux "--with-randomdev=/dev/random"
     ++ lib.optionals (openldap != null) [ "--with-ldap" "--with-ldapcrypto" ];
 
