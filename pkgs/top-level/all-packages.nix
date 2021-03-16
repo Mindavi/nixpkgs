@@ -1202,10 +1202,9 @@ with pkgs;
   };
 
   aflplusplus = callPackage ../tools/security/aflplusplus {
-    clang = clang_9;
-    llvm = llvm_9;
-    python = python37;
-    wine = null;
+    clang = clang_13;
+    llvm = llvm_13;
+    llvmPackages = llvmPackages_13;
   };
 
   libdislocator = callPackage ../tools/security/afl/libdislocator.nix { };
