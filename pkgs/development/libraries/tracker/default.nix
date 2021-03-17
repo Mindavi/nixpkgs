@@ -5,6 +5,7 @@
 , meson
 , ninja
 , pkg-config
+, asciidoc
 , gobject-introspection
 , python3
 , gtk-doc
@@ -39,9 +40,9 @@ stdenv.mkDerivation rec {
   };
 
   patches = [
-    ./disabled_docs.patch
     (substituteAll {
       src = ./fix-paths.patch;
+      inherit asciidoc;
     })
 
     # Fix consistency error with sqlite 3.34
@@ -57,6 +58,7 @@ stdenv.mkDerivation rec {
     ninja
     vala
     pkg-config
+    asciidoc
     gettext
     libxslt
     wrapGAppsNoGuiHook
@@ -82,6 +84,10 @@ stdenv.mkDerivation rec {
 
   checkInputs = [
     python3.pkgs.pygobject3
+  ];
+
+  mesonFlags = [
+    "-Ddocs=true"
   ];
 
   doCheck = true;
