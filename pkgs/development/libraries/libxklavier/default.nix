@@ -3,6 +3,7 @@
 
 let
   version = "5.4";
+  isCross = stdenv.buildPlatform != stdenv.targetPlatform;
 in
 stdenv.mkDerivation rec {
   pname = "libxklavier";
@@ -16,14 +17,14 @@ stdenv.mkDerivation rec {
 
   patches = [ ./honor-XKB_CONFIG_ROOT.patch ];
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = [ "out" "dev" ] ++ lib.optionals(!isCross) [ "devdoc" ];
 
   # TODO: enable xmodmap support, needs xmodmap DB
   propagatedBuildInputs = with xorg; [ libX11 libXi xkeyboard_config libxml2 libICE glib libxkbfile isocodes ];
 
-  nativeBuildInputs = [ autoreconfHook pkg-config gtk-doc docbook_xsl ];
+  nativeBuildInputs = [ autoreconfHook pkg-config docbook_xsl gtk-doc glib ];
 
-  buildInputs = [ gobject-introspection ];
+  buildInputs = lib.optionals (!isCross) [ gobject-introspection ];
 
   preAutoreconf = ''
     export NOCONFIGURE=1
@@ -34,6 +35,7 @@ stdenv.mkDerivation rec {
     "--with-xkb-base=${xkeyboard_config}/etc/X11/xkb"
     "--with-xkb-bin-base=${xorg.xkbcomp}/bin"
     "--disable-xmodmap-support"
+  ] ++ lib.optionals (!isCross) [
     "--enable-gtk-doc"
   ];
 
