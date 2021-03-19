@@ -3,6 +3,9 @@
 , libpsl, python3, brotli
 }:
 
+let
+  isCross = stdenv.buildPlatform != stdenv.targetPlatform;
+in
 stdenv.mkDerivation rec {
   pname = "libsoup";
   version = "2.72.0";
@@ -27,7 +30,8 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals stdenv.isLinux [
     libsysprof-capture
   ];
-  nativeBuildInputs = [ meson ninja pkg-config gobject-introspection vala glib ];
+  nativeBuildInputs = [ meson ninja pkg-config glib ]
+    ++ lib.optionals (!isCross) [ gobject-introspection vala ];
   propagatedBuildInputs = [ glib libxml2 ];
 
   NIX_CFLAGS_COMPILE = [ "-lpthread" ];
@@ -35,7 +39,8 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "-Dtls_check=false" # glib-networking is a runtime dependency, not a compile-time dependency
     "-Dgssapi=disabled"
-    "-Dvapi=enabled"
+    "-Dvapi=${if (!isCross) then "enabled" else "disabled"}"
+    "-Dintrospection=${if (!isCross) then "enabled" else "disabled"}"
     "-Dgnome=${lib.boolToString gnomeSupport}"
     "-Dntlm=disabled"
   ] ++ lib.optionals (!stdenv.isLinux) [
