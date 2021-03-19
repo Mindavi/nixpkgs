@@ -13,12 +13,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-vkBkOE4aVX/6xKjslkqlZkh5jdYVEawvvBLpj8PpuiA=";
   };
 
-  # Required for cross-compilation.
-  # They're dependencies of libwacom, and the whole of libwacom is linked to generate the hwdb.
-  # Generate-hwdb is build on the build platform for the build platform to run, so dependencies are listed
-  # in depsBuildBuild.
   depsBuildBuild = [ pkg-config glib libgudev gcc ];
-
   nativeBuildInputs = [ pkg-config meson ninja doxygen ];
 
   mesonFlags = [ "-Dtests=disabled" ];
@@ -26,8 +21,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ glib udev libgudev ];
 
   patches = [
-    # This patch is required to generate the hwdb.
-    ./generate-hwdb-native.patch
+    ./generate-hwdb-native2.patch
   ];
 
   meta = with lib; {

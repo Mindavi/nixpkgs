@@ -12,8 +12,8 @@ index 32ef797..282d9ab 100644
 +pkgconfig      = import('pkgconfig')
 +dep_gudev      = dependency('gudev-1.0')
 +dep_glib       = dependency('glib-2.0')
-+build_dep_gudev = dependency('gudev-1.0', native: true)
-+build_dep_glib  = dependency('glib-2.0', native: true)
++host_dep_gudev = dependency('gudev-1.0', native: true)
++host_dep_glib  = dependency('glib-2.0', native: true)
  
  includes_include = include_directories('include')
  includes_src = include_directories('libwacom')
@@ -21,9 +21,9 @@ index 32ef797..282d9ab 100644
  	    dep_glib
  ]
  
-+build_deps_libwacom = [
-+	    build_dep_gudev,
-+	    build_dep_glib
++host_deps_libwacom = [
++	    host_dep_gudev,
++	    host_dep_glib
 +]
  inc_libwacom = [
  	     includes_include,
@@ -32,10 +32,10 @@ index 32ef797..282d9ab 100644
  				'-DDATADIR="@0@"'.format(dir_data),
  			      ],
  			      install: true)
-+build_lib_libwacom = shared_library('wacom-for-generator',
++host_lib_libwacom = shared_library('wacom-for-generator',
 +			      src_libwacom,
 +			      include_directories: inc_libwacom,
-+			      dependencies: build_deps_libwacom,
++			      dependencies: host_deps_libwacom,
 +			      version: libwacom_so_version,
 +			      link_args: version_flag,
 +			      link_depends: mapfile,
@@ -47,7 +47,7 @@ index 32ef797..282d9ab 100644
 +			      native: true)
 +
  dep_libwacom = declare_dependency(link_with: lib_libwacom)
-+build_dep_libwacom = declare_dependency(link_with: build_lib_libwacom)
++host_dep_libwacom = declare_dependency(link_with: host_lib_libwacom)
  
  install_headers('libwacom/libwacom.h', subdir: 'libwacom-1.0/libwacom')
  
@@ -56,7 +56,7 @@ index 32ef797..282d9ab 100644
  gen_hwdb = executable('generate-hwdb',
  		      'tools/generate-hwdb.c',
 -		      dependencies: [dep_libwacom, dep_glib],
-+		      dependencies: [build_dep_libwacom, build_dep_glib],
++		      dependencies: [host_dep_libwacom, host_dep_glib],
  		      include_directories: [includes_src],
  		      c_args: tools_cflags,
 -		      install: false)
