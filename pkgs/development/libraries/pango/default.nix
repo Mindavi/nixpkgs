@@ -10,6 +10,7 @@ with lib;
 let
   pname = "pango";
   version = "1.47.0";
+  isCross = stdenv.hostPlatform != stdenv.buildPlatform;
 in stdenv.mkDerivation rec {
   name = "${pname}-${version}";
 
@@ -19,12 +20,18 @@ in stdenv.mkDerivation rec {
   };
 
   # FIXME: docs fail on darwin
-  outputs = [ "bin" "dev" "out" ] ++ optional (!stdenv.isDarwin) "devdoc";
+  outputs = [ "bin" "dev" "out" ] ++ optional (!stdenv.isDarwin && !isCross) "devdoc";
 
   nativeBuildInputs = [
     meson ninja
     glib # for glib-mkenum
-    pkg-config gobject-introspection gtk-doc docbook_xsl docbook_xml_dtd_43
+    pkg-config
+    #gobject-introspection
+    docbook_xsl
+    docbook_xml_dtd_43
+  ] ++ lib.optionals (!isCross) [
+    gobject-introspection
+    gtk-doc
   ];
   buildInputs = [
     fribidi
@@ -39,10 +46,10 @@ in stdenv.mkDerivation rec {
     optional x11Support libXft;
 
   mesonFlags = [
-    "-Dgtk_doc=${if stdenv.isDarwin then "false" else "true"}"
+    "-Dgtk_doc=${if (stdenv.isDarwin || isCross) then "false" else "true"}"
   ] ++ lib.optionals stdenv.isDarwin [
     "-Dxft=disabled"  # only works with x11
-  ];
+  ] ++ lib.optional (isCross) "-Dintrospection=false";
 
   enableParallelBuilding = true;
 
