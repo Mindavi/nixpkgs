@@ -1,10 +1,11 @@
 { lib, stdenv, fetchurl, pkg-config, glib, gdk-pixbuf, pango, cairo, libxml2
 , bzip2, libintl, darwin, rustc, cargo, gnome3
-, vala, gobject-introspection }:
+, vala, gobject-introspection, buildPackages }:
 
 let
   pname = "librsvg";
   version = "2.50.1";
+  isCross = stdenv.hostPlatform != stdenv.buildPlatform;
 in
 stdenv.mkDerivation rec {
   name = "${pname}-${version}";
@@ -16,6 +17,9 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "dev" "installedTests" ];
 
+  # Prevent this error: error: linker `cc` not found
+  depsBuildBuild = [ buildPackages.stdenv.cc ];
+
   buildInputs = [ libxml2 bzip2 pango libintl ]
     ++ lib.optionals stdenv.isDarwin [ darwin.libobjc ];
 
@@ -23,17 +27,30 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [ glib gdk-pixbuf cairo ];
 
-  nativeBuildInputs = [ pkg-config rustc cargo vala gobject-introspection ]
+  nativeBuildInputs = [
+      pkg-config
+      rustc
+      cargo
+      # Required for gdk-pixbuf-query-loaders.
+      gdk-pixbuf.dev
+    ]
+    ++ lib.optionals (!isCross) [
+      vala
+      gobject-introspection
+    ]
     ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
       ApplicationServices
     ]);
 
   configureFlags = [
-    "--enable-introspection"
-    "--enable-vala"
     "--enable-installed-tests"
     "--enable-always-build-tests"
-  ] ++ lib.optional stdenv.isDarwin "--disable-Bsymbolic";
+  ] ++ lib.optional stdenv.isDarwin "--disable-Bsymbolic"
+    ++ lib.optionals (!isCross) [
+    "--enable-introspection"
+    "--enable-vala"
+  # Prevent error where introspection is expected
+  ] ++ lib.optional (isCross) "enable_introspection=no";
 
   makeFlags = [
     "installed_test_metadir=$(installedTests)/share/installed-tests/RSVG"
