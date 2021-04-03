@@ -23,11 +23,14 @@
 , lib
 }:
 
+let
+  isCross = stdenv.hostPlatform != stdenv.buildPlatform;
+in
 stdenv.mkDerivation rec {
   pname = "gdk-pixbuf";
   version = "2.42.2";
 
-  outputs = [ "out" "dev" "man" "devdoc" "installedTests" ];
+  outputs = [ "out" "dev" "man" ] ++ lib.optionals (!isCross) [ "devdoc" "installedTests" ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -49,11 +52,13 @@ stdenv.mkDerivation rec {
     libxslt
     docbook-xsl-nons
     docbook_xml_dtd_43
-    gtk-doc
-    gobject-introspection
     makeWrapper
     glib
-  ] ++ lib.optional stdenv.isDarwin fixDarwinDylibNames;
+  ] ++ lib.optional stdenv.isDarwin fixDarwinDylibNames
+    ++ lib.optionals (!isCross) [
+    gobject-introspection
+    gtk-doc
+  ];
 
   propagatedBuildInputs = [
     glib
@@ -63,8 +68,8 @@ stdenv.mkDerivation rec {
   ];
 
   mesonFlags = [
-    "-Dgtk_doc=true"
-    "-Dintrospection=${if gobject-introspection != null then "enabled" else "disabled"}"
+    "-Dgtk_doc=${if isCross then "false" else "true"}"
+    "-Dintrospection=${if (gobject-introspection != null && (!isCross)) then "enabled" else "disabled"}"
     "-Dgio_sniffing=false"
   ];
 
