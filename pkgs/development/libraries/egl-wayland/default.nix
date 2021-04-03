@@ -55,6 +55,12 @@ in stdenv.mkDerivation rec {
   # https://github.com/NVIDIA/egl-wayland/pull/24
   patches = [ ./eglmesaext.patch ];
 
+  depsBuildBuild = [
+    pkg-config
+    # for wayland-scanner
+    wayland
+  ];
+
   nativeBuildInputs = [
     meson
     ninja
