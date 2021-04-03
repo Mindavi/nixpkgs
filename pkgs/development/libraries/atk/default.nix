@@ -5,6 +5,7 @@
 let
   pname = "atk";
   version = "2.36.0";
+  isCross = stdenv.hostPlatform != stdenv.buildPlatform;
 in
 
 stdenv.mkDerivation rec {
@@ -18,7 +19,8 @@ stdenv.mkDerivation rec {
   outputs = [ "out" "dev" ];
 
   nativeBuildInputs = [ meson ninja pkg-config gettext gobject-introspection glib ]
-    ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
+    ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames
+    ++ lib.optional (!isCross) gobject-introspection;
 
   propagatedBuildInputs = [
     # Required by atk.pc
@@ -29,6 +31,10 @@ stdenv.mkDerivation rec {
     # meson builds an incorrect .pc file
     # glib should be Requires not Requires.private
     ./fix_pc.patch
+  ];
+
+  mesonFlags = lib.optionals (isCross) [
+    "-Dintrospection=false"
   ];
 
   doCheck = true;
