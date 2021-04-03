@@ -12,6 +12,8 @@ assert fontconfigSupport -> fontconfig != null;
 
 let
   mkFlag = optSet: flag: if optSet then "--enable-${flag}" else "--disable-${flag}";
+  isCross = stdenv.buildPlatform != stdenv.hostPlatform;
+  enableEncaSupport = !isCross && encaSupport;
 in
 
 with lib;
@@ -25,7 +27,7 @@ stdenv.mkDerivation rec {
   };
 
   configureFlags = [
-    (mkFlag encaSupport "enca")
+    (mkFlag enableEncaSupport "enca")
     (mkFlag fontconfigSupport "fontconfig")
     (mkFlag rasterizerSupport "rasterizer")
     (mkFlag largeTilesSupport "large-tiles")
@@ -34,7 +36,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkg-config yasm ];
 
   buildInputs = [ freetype fribidi harfbuzz ]
-    ++ optional encaSupport enca
+    ++ optional enableEncaSupport enca
     ++ optional fontconfigSupport fontconfig
     ++ optional stdenv.isDarwin libiconv;
 
