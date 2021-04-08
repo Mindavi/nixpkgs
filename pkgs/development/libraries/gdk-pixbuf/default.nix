@@ -21,6 +21,7 @@
 , doCheck ? false
 , makeWrapper
 , lib
+, buildPackages
 }:
 
 let
@@ -96,6 +97,11 @@ stdenv.mkDerivation rec {
     '' + lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
       # We need to install 'loaders.cache' in lib/gdk-pixbuf-2.0/2.10.0/
       $dev/bin/gdk-pixbuf-query-loaders --update-cache
+    '' + lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
+      # librsvg depends on this file being available
+      # maybe other things do too (but implicitly)
+      # so let's build the cache file using an emulator
+      ${buildPackages.qemu}/bin/qemu-aarch64 $dev/bin/gdk-pixbuf-query-loaders --update-cache
     '';
 
   # The fixDarwinDylibNames hook doesn't patch binaries.
