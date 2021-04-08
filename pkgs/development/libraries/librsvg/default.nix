@@ -1,6 +1,8 @@
 { lib, stdenv, fetchurl, pkg-config, glib, gdk-pixbuf, pango, cairo, libxml2
 , bzip2, libintl, darwin, rustc, cargo, gnome3
-, vala, gobject-introspection, buildPackages }:
+, vala, gobject-introspection, buildPackages
+, buildLoadersCache ? stdenv.buildPlatform != stdenv.hostPlatform
+}:
 
 let
   pname = "librsvg";
@@ -20,7 +22,7 @@ stdenv.mkDerivation rec {
   # Prevent this error: error: linker `cc` not found
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
-  buildInputs = [ libxml2 bzip2 pango libintl ]
+  buildInputs = [ libxml2 bzip2 pango libintl gdk-pixbuf ]
     ++ lib.optionals stdenv.isDarwin [ darwin.libobjc ];
 
   NIX_LDFLAGS = if stdenv.isDarwin then "-lobjc" else null;
@@ -76,14 +78,16 @@ stdenv.mkDerivation rec {
          -i gdk-pixbuf-loader/Makefile
 
     # Fix thumbnailer path
-    sed -e "s#@bindir@\(/gdk-pixbuf-thumbnailer\)#${gdk-pixbuf}/bin\1#g" \
+    sed -e "s#@bindir@\(/gdk-pixbuf-thumbnailer\)#${gdk-pixbuf.out}/bin\1#g" \
         -i gdk-pixbuf-loader/librsvg.thumbnailer.in
   '';
 
   doCheck = false; # fails 20 of 145 tests, very likely to be buggy
 
   # Merge gdkpixbuf and librsvg loaders
-  postInstall = ''
+  postInstall = lib.optionalString buildLoadersCache ''
+    ${buildPackages.qemu}/bin/qemu-aarch64 ${gdk-pixbuf.dev}/bin/gdk-pixbuf-query-loaders > $GDK_PIXBUF/loaders.cache
+  '' + ''
     mv $GDK_PIXBUF/loaders.cache $GDK_PIXBUF/loaders.cache.tmp
     cat ${gdk-pixbuf.out}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache $GDK_PIXBUF/loaders.cache.tmp > $GDK_PIXBUF/loaders.cache
     rm $GDK_PIXBUF/loaders.cache.tmp
