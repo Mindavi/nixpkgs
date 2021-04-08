@@ -26,6 +26,10 @@ stdenv.mkDerivation rec {
     })
   ];
 
+  depsBuildBuild = [
+    pkg-config
+  ];
+
   nativeBuildInputs = [
     meson ninja pkg-config wayland scdoc
   ];
