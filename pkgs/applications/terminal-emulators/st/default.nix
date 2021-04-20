@@ -1,4 +1,6 @@
 { lib, stdenv, fetchurl, pkg-config, writeText, libX11, ncurses
+, fontconfig
+, freetype
 , libXft, conf ? null, patches ? [], extraLibs ? []}:
 
 with lib;
@@ -21,8 +23,22 @@ stdenv.mkDerivation rec {
     substituteInPlace config.mk --replace "-lrt" ""
   '';
 
-  nativeBuildInputs = [ pkg-config ncurses ];
-  buildInputs = [ libX11 libXft ] ++ extraLibs;
+  strictDeps = true;
+
+  makeFlags = [
+    "PKG_CONFIG=${stdenv.cc.targetPrefix}pkg-config"
+  ];
+
+  nativeBuildInputs = [
+    pkg-config
+    ncurses
+    fontconfig
+    freetype
+  ];
+  buildInputs = [
+    libX11
+    libXft
+  ] ++ extraLibs;
 
   installPhase = ''
     TERMINFO=$out/share/terminfo make install PREFIX=$out
