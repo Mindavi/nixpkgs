@@ -1,5 +1,6 @@
-{ lib, wayland, wayland-protocols, xorgserver, xkbcomp, xkeyboard_config
-, epoxy, libxslt, libunwind, makeWrapper, egl-wayland
+{ stdenv, lib, wayland, wayland-protocols, xorgserver, xkbcomp, xkeyboard_config
+, epoxy, libxslt, libunwind, makeWrapper, egl-wayland, pkg-config
+, withWrapper ? (stdenv.buildPlatform == stdenv.hostPlatform)
 , defaultFontPath ? "" }:
 
 with lib;
@@ -7,9 +8,14 @@ with lib;
 xorgserver.overrideAttrs (oldAttrs: {
 
   name = "xwayland-${xorgserver.version}";
+  nativeBuildInputs = [
+    pkg-config
+    wayland
+  ];
   buildInputs = oldAttrs.buildInputs ++ [ egl-wayland ];
   propagatedBuildInputs = oldAttrs.propagatedBuildInputs
-    ++ [wayland wayland-protocols epoxy libxslt makeWrapper libunwind];
+    ++ [wayland wayland-protocols epoxy libxslt libunwind]
+    ++ lib.optional withWrapper makeWrapper;
   configureFlags = [
     "--disable-docs"
     "--disable-devel-docs"
