@@ -19,7 +19,14 @@ stdenv.mkDerivation rec {
       --replace "version: '1.5'" "version: '${version}'"
   '';
 
-  nativeBuildInputs = [ meson ninja pkg-config scdoc ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+    scdoc
+    # for wayland-scanner
+    wayland
+  ];
   buildInputs = [ wayland wayland-protocols systemd ];
 
   mesonFlags = [ "-Dman-pages=enabled" "-Dlogind=enabled" ];

@@ -19,7 +19,14 @@ stdenv.mkDerivation rec {
       --replace "version: '1.4'" "version: '${version}'"
   '';
 
-  nativeBuildInputs = [ meson ninja pkg-config scdoc ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+    scdoc
+    # for wayland-scanner
+    wayland
+  ];
   buildInputs = [ wayland wayland-protocols libxkbcommon cairo gdk-pixbuf pam ];
 
   mesonFlags = [
