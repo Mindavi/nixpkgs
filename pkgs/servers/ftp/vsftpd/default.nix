@@ -18,13 +18,14 @@ stdenv.mkDerivation rec {
     substituteInPlace Makefile \
       --replace -dirafter "" \
       --replace /usr $out \
-      --replace /etc $out/etc
+      --replace /etc $out/etc \
+      --replace gcc "$CC" \
+      --replace "-Werror" ""
 
     mkdir -p $out/sbin $out/man/man{5,8}
   '';
 
   NIX_LDFLAGS = "-lcrypt -lssl -lcrypto -lpam -lcap";
-  NIX_CFLAGS_COMPILE = "-Wno-error=enum-conversion";
 
   enableParallelBuilding = true;
 
