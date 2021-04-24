@@ -17,6 +17,13 @@ stdenv.mkDerivation {
   prePatch = "rm -rf Source/Lib* Source/OpenEXR Source/ZLib";
   patches = [ ./unbundle.diff ];
 
+  postPatch = ''
+    substituteInPlace Makefile.fip \
+      --replace "pkg-config" "$PKG_CONFIG"
+    substituteInPlace Makefile.gnu \
+      --replace "pkg-config" "$PKG_CONFIG"
+  '';
+
   nativeBuildInputs = [ pkg-config ] ++ lib.optional stdenv.isDarwin darwin.cctools;
   buildInputs = [ libtiff libtiff.dev_private libpng zlib libwebp libraw openexr openjpeg libjpeg libjpeg.dev_private jxrlib ];
 
