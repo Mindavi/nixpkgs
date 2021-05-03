@@ -1,5 +1,6 @@
 { lib, stdenv, fetchurl, substituteAll, pkg-config, libxslt, ninja, gnome3, gtk3, glib
 , gettext, libxml2, xkeyboard_config, isocodes, meson, wayland
+, withIntrospection ? (stdenv.hostPlatform == stdenv.buildPlatform)
 , libseccomp, systemd, bubblewrap, gobject-introspection, gtk-doc, docbook_xsl, gsettings-desktop-schemas }:
 
 stdenv.mkDerivation rec {
@@ -14,9 +15,12 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    pkg-config meson ninja gettext libxslt libxml2 gobject-introspection
+    pkg-config meson ninja gettext libxslt libxml2
     gtk-doc docbook_xsl glib
+  ] ++ lib.optionals withIntrospection [
+    gobject-introspection
   ];
+
   buildInputs = [
     bubblewrap xkeyboard_config isocodes wayland
     gtk3 glib libseccomp systemd
@@ -35,6 +39,7 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "-Dgtk_doc=true"
     "-Ddesktop_docs=false"
+    "-Dintrospection=${lib.boolToString withIntrospection}"
   ];
 
   passthru = {
