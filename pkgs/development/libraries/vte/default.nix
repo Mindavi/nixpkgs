@@ -10,7 +10,9 @@
 , glib
 , gtk3
 , gobject-introspection
+, withIntrospection ? stdenv.buildPlatform == stdenv.hostPlatform
 , vala
+, withVala ? stdenv.buildPlatform == stdenv.hostPlatform
 , libxml2
 , gnutls
 , gperf
@@ -39,12 +41,15 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     gettext
-    gobject-introspection
     gperf
     libxml2
     meson
     ninja
     pkg-config
+    glib
+  ] ++ lib.optionals withIntrospection [
+    gobject-introspection
+  ] ++ lib.optionals withVala [
     vala
   ];
 
@@ -62,6 +67,11 @@ stdenv.mkDerivation rec {
     gtk3
     glib
     pango
+  ];
+
+  mesonFlags = [
+    "-Dgir=${lib.boolToString withIntrospection}"
+    "-Dvapi=${lib.boolToString withVala}"
   ];
 
   patches =
