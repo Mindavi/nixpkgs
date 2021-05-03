@@ -2,6 +2,7 @@
 , fetchurl
 , pkg-config
 , glib
+, withIntrospection ? (stdenv.buildPlatform == stdenv.hostPlatform)
 , gobject-introspection
 , meson
 , ninja
@@ -29,7 +30,12 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     glib
+  ] ++ lib.optionals withIntrospection [
     gobject-introspection
+  ];
+
+  mesonFlags = [
+    "-Dintrospection=${lib.boolToString withIntrospection}"
   ];
 
   postPatch = ''
