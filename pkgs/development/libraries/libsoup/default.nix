@@ -1,6 +1,23 @@
-{ stdenv, lib, fetchurl, glib, libxml2, meson, ninja, pkg-config, gnome, libsysprof-capture
-, gnomeSupport ? true, sqlite, glib-networking, gobject-introspection, vala
-, libpsl, python3, brotli
+{ stdenv
+, lib
+, fetchurl
+, glib
+, libxml2
+, meson
+, ninja
+, pkg-config
+, gnome
+, libsysprof-capture
+, gnomeSupport ? true
+, sqlite
+, glib-networking
+, gobject-introspection
+, withIntrospection ? stdenv.buildPlatform == stdenv.targetPlatform
+, vala
+, withVala ? stdenv.buildPlatform == stdenv.targetPlatform
+, libpsl
+, python3
+, brotli
 }:
 
 stdenv.mkDerivation rec {
@@ -27,7 +44,9 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals stdenv.isLinux [
     libsysprof-capture
   ];
-  nativeBuildInputs = [ meson ninja pkg-config gobject-introspection vala glib ];
+  nativeBuildInputs = [ meson ninja pkg-config glib ]
+    ++ lib.optional withIntrospection gobject-introspection
+    ++ lib.optional withVala vala;
   propagatedBuildInputs = [ glib libxml2 ];
 
   NIX_CFLAGS_COMPILE = [ "-lpthread" ];
@@ -35,7 +54,8 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "-Dtls_check=false" # glib-networking is a runtime dependency, not a compile-time dependency
     "-Dgssapi=disabled"
-    "-Dvapi=enabled"
+    "-Dvapi=${if withVala then "enabled" else "disabled"}"
+    "-Dintrospection=${if withIntrospection then "enabled" else "disabled"}"
     "-Dgnome=${lib.boolToString gnomeSupport}"
     "-Dntlm=disabled"
   ] ++ lib.optionals (!stdenv.isLinux) [
