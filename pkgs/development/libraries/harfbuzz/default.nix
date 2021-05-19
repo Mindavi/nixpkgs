@@ -1,13 +1,26 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, glib, freetype, cairo, libintl
-, meson, ninja
+{ lib
+, stdenv
+, fetchFromGitHub
+, pkg-config
+, glib
+, freetype
+, cairo
+, libintl
+, meson
+, ninja
 , gobject-introspection
-, icu, graphite2, harfbuzz # The icu variant uses and propagates the non-icu one.
-, ApplicationServices, CoreText
+, icu
+, graphite2
+, harfbuzz # The icu variant uses and propagates the non-icu one.
+, ApplicationServices
+, CoreText
 , withCoreText ? false
 , withIcu ? false # recommended by upstream as default, but most don't needed and it's big
 , withGraphite2 ? true # it is small and major distros do include it
 , python3
-, gtk-doc, docbook-xsl-nons, docbook_xml_dtd_43
+, gtk-doc
+, docbook-xsl-nons
+, docbook_xml_dtd_43
 , withIntrospection ? stdenv.buildPlatform == stdenv.hostPlatform
 }:
 
@@ -22,9 +35,9 @@ stdenv.mkDerivation {
   name = "harfbuzz${optionalString withIcu "-icu"}-${version}";
 
   src = fetchFromGitHub {
-    owner  = "harfbuzz";
-    repo   = "harfbuzz";
-    rev    = version;
+    owner = "harfbuzz";
+    repo = "harfbuzz";
+    rev = version;
     sha256 = "sha256-JnvOFGK2HWIpzuwgZtyt0IfKfnoXD1LMeVb3RzMmyY4=";
   };
 
@@ -65,7 +78,7 @@ stdenv.mkDerivation {
     ++ lib.optional (withIntrospection) gobject-introspection
     ++ lib.optionals withCoreText [ ApplicationServices CoreText ];
 
-  propagatedBuildInputs = []
+  propagatedBuildInputs = [ ]
     ++ optional withGraphite2 graphite2
     ++ optionals withIcu [ icu harfbuzz ];
 
