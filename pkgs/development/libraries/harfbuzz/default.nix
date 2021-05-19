@@ -8,6 +8,7 @@
 , withGraphite2 ? true # it is small and major distros do include it
 , python3
 , gtk-doc, docbook-xsl-nons, docbook_xml_dtd_43
+, withIntrospection ? stdenv.buildPlatform == stdenv.hostPlatform
 }:
 
 let
@@ -43,21 +44,25 @@ stdenv.mkDerivation {
     (mesonFeatureFlag "graphite" withGraphite2)
     (mesonFeatureFlag "icu" withIcu)
     (mesonFeatureFlag "coretext" withCoreText)
+    (mesonFeatureFlag "introspection" withIntrospection)
   ];
+
+  strictDeps = true;
 
   nativeBuildInputs = [
     meson
     ninja
-    gobject-introspection
     libintl
     pkg-config
     python3
     gtk-doc
     docbook-xsl-nons
     docbook_xml_dtd_43
-  ];
+    glib # glib-mkenums
+  ] ++ lib.optional (withIntrospection) gobject-introspection;
 
   buildInputs = [ glib freetype cairo ] # recommended by upstream
+    ++ lib.optional (withIntrospection) gobject-introspection
     ++ lib.optionals withCoreText [ ApplicationServices CoreText ];
 
   propagatedBuildInputs = []
