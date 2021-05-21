@@ -1,6 +1,6 @@
 { lib, stdenv, fetchurl, pkg-config, yasm
 , freetype, fribidi, harfbuzz
-, encaSupport ? true, enca ? null # enca support
+, encaSupport ? (stdenv.buildPlatform == stdenv.hostPlatform), enca ? null # enca support
 , fontconfigSupport ? true, fontconfig ? null # fontconfig support
 , rasterizerSupport ? false # Internal rasterizer
 , largeTilesSupport ? false # Use larger tiles in the rasterizer
