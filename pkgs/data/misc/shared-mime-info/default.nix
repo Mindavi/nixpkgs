@@ -9,6 +9,7 @@
 , itstool
 , libxml2
 , glib
+, buildPackages
 }:
 
 stdenv.mkDerivation rec {
@@ -30,6 +31,17 @@ stdenv.mkDerivation rec {
       url = "https://gitlab.freedesktop.org/xdg/shared-mime-info/-/merge_requests/110.patch";
       sha256 = "0p5gxlcmn8ji5bc7pd105s1halqwa1d28lfx9yj43rn6mav7allx";
     })
+    # Support cross-compilation by cross-compiling the update tool
+    ./cross-shared-mime-info.patch
+  ];
+
+  strictDeps = true;
+
+  depsBuildBuild = [
+    buildPackages.stdenv.cc
+    pkg-config
+    glib
+    libxml2
   ];
 
   nativeBuildInputs = [

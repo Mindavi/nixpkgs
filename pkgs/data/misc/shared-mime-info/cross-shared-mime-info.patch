@@ -1,0 +1,47 @@
+diff --git a/meson.build b/meson.build
+index 0d08c8a..4933aac 100644
+--- a/meson.build
++++ b/meson.build
+@@ -60,6 +60,9 @@ endforeach
+ libxml = dependency('libxml-2.0',   version: '>=2.4')
+ glib2  = dependency('glib-2.0',     version: '>=2.6.0')
+ 
++libxml_native = dependency('libxml-2.0',   version: '>=2.4',   native: true)
++glib2_native  = dependency('glib-2.0',     version: '>=2.6.0', native: true)
++
+ gio = dependency('gio-2.0', required: false)
+ 
+ subdir('po')
+@@ -78,10 +81,7 @@ configure_file(
+ )
+ 
+ if get_option('update-mimedb')
+-    upd_tool = (meson.is_cross_build()
+-        ? find_program('update-mime-database').path()
+-        : update_mime_database.full_path()
+-    )
++    upd_tool = update_mime_database_native.full_path()
+     meson.add_install_script('sh', '-c', ' '.join([
+         upd_tool, '-V', '${MESON_INSTALL_DESTDIR_PREFIX}' / get_option('datadir') / 'mime',
+     ]))
+diff --git a/src/meson.build b/src/meson.build
+index 5da9ddf..ceb574f 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -13,6 +13,16 @@ update_mime_database = executable('update-mime-database',
+     install: true,
+ )
+ 
++update_mime_database_native = executable('update-mime-database-native',
++    'update-mime-database.c',
++    dependencies: [
++        glib2_native,
++        libxml_native,
++    ],
++    install: false,
++    native: true,
++)
++
+ test_subclassing = executable('test-subclassing',
+     'test-subclassing.c',
+     dependencies: [
