@@ -8,6 +8,7 @@
 , mesa
 , libGL
 , wayland
+, wayland-scanner
 }:
 
 let
@@ -50,6 +51,11 @@ in stdenv.mkDerivation rec {
     rev = version;
     sha256 = "1n9lg8hpjgxlf7dpddkjhbslsfd0symla2wk6jjmnl9n9jv2gmzk";
   };
+
+  depsBuildBuild = [
+    pkg-config
+    wayland-scanner
+  ];
 
   nativeBuildInputs = [
     meson
