@@ -18,6 +18,7 @@
 , vala
 , gobject-introspection
 , nixosTests
+, buildPackages
 }:
 
 stdenv.mkDerivation rec {
@@ -31,12 +32,17 @@ stdenv.mkDerivation rec {
     sha256 = "iAdJGZOoevVgxdP1I7jUpLugxQilYPH5NxdytRR3rFc=";
   };
 
+  depsBuildBuild = [
+    buildPackages.stdenv.cc
+  ];
+
   nativeBuildInputs = [
     pkg-config
     rustc
     cargo
     vala
     gobject-introspection
+    gdk-pixbuf.dev
   ] ++ lib.optionals stdenv.isDarwin [
     ApplicationServices
     Foundation
@@ -58,8 +64,8 @@ stdenv.mkDerivation rec {
   ];
 
   configureFlags = [
-    "--enable-introspection"
-  ] ++ lib.optionals (!stdenv.isDarwin) [
+    "${if (stdenv.buildPlatform == stdenv.targetPlatform) then "--enable-introspection" else "--disable-introspection"}"
+  ] ++ lib.optionals (!stdenv.isDarwin && (stdenv.buildPlatform == stdenv.targetPlatform)) [
     # Vapi does not build on MacOS.
     # https://github.com/NixOS/nixpkgs/pull/117081#issuecomment-827782004
     "--enable-vala"
@@ -96,7 +102,7 @@ stdenv.mkDerivation rec {
   '';
 
   # Merge gdkpixbuf and librsvg loaders
-  postInstall = ''
+  postInstall = lib.optionals (stdenv.buildPlatform == stdenv.targetPlatform) ''
     mv $GDK_PIXBUF/loaders.cache $GDK_PIXBUF/loaders.cache.tmp
     cat ${gdk-pixbuf.out}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache $GDK_PIXBUF/loaders.cache.tmp > $GDK_PIXBUF/loaders.cache
     rm $GDK_PIXBUF/loaders.cache.tmp
