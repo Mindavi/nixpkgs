@@ -31,7 +31,7 @@
 , gnome
 , gsettings-desktop-schemas
 , sassc
-, trackerSupport ? stdenv.isLinux
+, trackerSupport ? stdenv.isLinux && (stdenv.buildPlatform == stdenv.hostPlatform)
 , tracker
 , x11Support ? stdenv.isLinux
 , waylandSupport ? stdenv.isLinux
@@ -45,6 +45,7 @@
 , AppKit
 , Cocoa
 , broadwaySupport ? true
+, wayland-scanner
 }:
 
 let
@@ -99,6 +100,8 @@ stdenv.mkDerivation rec {
     pkg-config
     python3
     sassc
+    wayland-scanner
+    gdk-pixbuf
   ] ++ setupHooks ++ lib.optionals withGtkDoc [
     docbook_xml_dtd_43
     docbook-xsl-nons
@@ -153,6 +156,8 @@ stdenv.mkDerivation rec {
     "-Dtests=false"
     "-Dtracker3=${lib.boolToString trackerSupport}"
     "-Dbroadway_backend=${lib.boolToString broadwaySupport}"
+  ] ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
+    "-Dintrospection=false"
   ];
 
   doCheck = false; # needs X11
