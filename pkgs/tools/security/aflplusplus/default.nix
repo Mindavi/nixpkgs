@@ -26,6 +26,7 @@ let
       # Prevents afl-gcc picking up any (possibly incorrect) gcc from the path
       substituteInPlace src/afl-cc.c \
         --replace "CLANGPP_BIN" '"${clang}/bin/clang++"' \
+        --replace "CLANG_BIN" '"${clang}/bin/clang"' \
         --replace 'getenv("AFL_PATH")' "(getenv(\"AFL_PATH\") ? getenv(\"AFL_PATH\") : \"$out/lib/afl\")" \
         --replace '"gcc"' '"${gcc}/bin/gcc"' \
         --replace '"g++"' '"${gcc}/bin/g++"' \
