@@ -19,7 +19,7 @@ wafConfigurePhase() {
         $wafConfigureFlags "${wafConfigureFlagsArray[@]}"
         ${configureTargets:-configure}
     )
-    if [ -z "${dontAddWafCrossFlags:-}" ]; then
+    if [ ! -z "${addWafCrossFlags:-}" ]; then
         flagsArray+=(@crossFlags@)
     fi
     echoCmd 'configure flags' "${flagsArray[@]}"

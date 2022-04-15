@@ -20,7 +20,6 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkg-config python3 wafHook ];
   buildInputs = [ pcre ];
   propagatedBuildInputs = [ serd ];
-  dontAddWafCrossFlags = true;
 
   meta = with lib; {
     homepage = "http://drobilla.net/software/sord";

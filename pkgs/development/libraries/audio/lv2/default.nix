@@ -36,7 +36,6 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals stdenv.isDarwin [
     "--lv2dir=${placeholder "out"}/lib/lv2"
   ];
-  dontAddWafCrossFlags = true;
 
   passthru.tests = {
     inherit pipewire;
