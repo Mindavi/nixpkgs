@@ -32,6 +32,7 @@ in
   acme = handleTest ./acme.nix {};
   adguardhome = handleTest ./adguardhome.nix {};
   aesmd = handleTest ./aesmd.nix {};
+  aflplusplus = handleTest ./aflplusplus.nix {};
   agate = handleTest ./web-servers/agate.nix {};
   agda = handleTest ./agda.nix {};
   airsonic = handleTest ./airsonic.nix {};
