@@ -1,4 +1,4 @@
-{ lib, stdenv, cabextract, fetchurl, fetchFromGitHub, libusb1 }:
+{ lib, stdenv, cabextract, fetchurl, fetchFromGitHub, libusb1, fetchpatch }:
 
 stdenv.mkDerivation rec {
   pname = "xow";
@@ -15,6 +15,14 @@ stdenv.mkDerivation rec {
     url = "http://download.windowsupdate.com/c/msdownload/update/driver/drvs/2017/07/1cd6a87c-623f-4407-a52d-c31be49e925c_e19f60808bdcbfbd3c3df6be3e71ffc52e43261e.cab";
     sha256 = "013g1zngxffavqrk5jy934q3bdhsv6z05ilfixdn8dj0zy26lwv5";
   };
+
+  patches = [
+    # Fix build on newer gcc / stdlib by adding a missing include.
+    (fetchpatch {
+      url = "https://github.com/medusalix/xow/commit/99100fb52953e0218bc140bb04febd8ae51b1506.patch";
+      hash = "sha256-EOGGJdKMaq51eb5VhjOvG2y/HWOMYFv+eQwxjx7WGQ0=";
+    })
+  ];
 
   makeFlags = [
     "BUILD=RELEASE"
