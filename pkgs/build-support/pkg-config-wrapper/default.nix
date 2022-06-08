@@ -17,11 +17,7 @@ let
   inherit (stdenv) hostPlatform targetPlatform;
 
   # Prefix for binaries. Customarily ends with a dash separator.
-  #
-  # TODO(@Ericson2314) Make unconditional, or optional but always true by
-  # default.
-  targetPrefix = lib.optionalString (targetPlatform != hostPlatform)
-                                        (targetPlatform.config + "-");
+  targetPrefix = targetPlatform.config + "-";
 
   # See description in cc-wrapper.
   suffixSalt = replaceStrings ["-" "."] ["_" "_"] targetPlatform.config;
