@@ -28,6 +28,12 @@ stdenv.mkDerivation rec {
   buildInputs = [libxml2 openssl]
     ++ lib.optional compressionSupport zlib;
 
+  preConfigure = ''
+    # Ensure the correct (possibly prefixed) pkg-config is used.
+    # An absolute path is expected here.
+    export PKG_CONFIG="$(command -v "$PKG_CONFIG")"
+  '';
+
   configureFlags = [
     (lib.enableFeature shared "shared")
     (lib.enableFeature static "static")
