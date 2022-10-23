@@ -5,13 +5,13 @@
 let
   aflplusplus = stdenvNoCC.mkDerivation rec {
     pname = "aflplusplus";
-    version = "3.14c";
+    version = "4.02c";
 
     src = fetchFromGitHub {
       owner = "AFLplusplus";
       repo = "AFLplusplus";
       rev = version;
-      sha256 = "sha256-VLq+00TGxLmD6BrnBoXss8/zvvb6hPBcEioh4CEr2Tk=";
+      hash = "sha256-H0H2vJFKYEj+UFfoLzMkxu/ScCmpx40IYYNpcm42IRM=";
     };
     enableParallelBuilding = true;
 

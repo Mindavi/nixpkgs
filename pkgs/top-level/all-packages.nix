@@ -1201,11 +1201,7 @@ with pkgs;
     llvm = llvm_12;
   };
 
-  aflplusplus = callPackage ../tools/security/aflplusplus {
-    clang = clang_13;
-    llvm = llvm_13;
-    llvmPackages = llvmPackages_13;
-  };
+  aflplusplus = callPackage ../tools/security/aflplusplus { };
 
   libdislocator = callPackage ../tools/security/afl/libdislocator.nix { };
 
