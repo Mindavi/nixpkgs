@@ -39,5 +39,7 @@ buildGoModule rec {
     homepage = "https://github.com/superfly/litefs";
     license = licenses.asl20;
     maintainers = with maintainers; [ dit7ya ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

@@ -31,5 +31,7 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://github.com/mayeranalytics/coinlive";
     license = licenses.gpl3Only;
     maintainers = with maintainers; [ fab ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

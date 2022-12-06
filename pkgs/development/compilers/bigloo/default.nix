@@ -70,5 +70,7 @@ stdenv.mkDerivation rec {
       Scheme and C programs, between Scheme and Java programs, and
       between Scheme and C# programs.
     '';
+    # never built on aarch64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

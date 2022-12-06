@@ -21,5 +21,7 @@ buildGoModule rec {
     description = "Remote control for Icom radio transceivers";
     license = licenses.mit;
     maintainers = with maintainers; [ mvs ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

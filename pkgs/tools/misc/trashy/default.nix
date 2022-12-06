@@ -27,5 +27,7 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://github.com/oberblastmeister/trashy";
     license = with licenses; [ asl20 /* or */ mit ];
     maintainers = with maintainers; [ oberblastmeister ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

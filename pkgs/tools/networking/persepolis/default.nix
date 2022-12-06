@@ -66,5 +66,7 @@ buildPythonApplication rec {
     homepage = "https://persepolisdm.github.io/";
     license = licenses.gpl3;
     maintainers = [ ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

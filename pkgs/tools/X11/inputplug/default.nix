@@ -30,6 +30,8 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://github.com/andrewshadura/inputplug";
     license = licenses.mit;
     maintainers = with maintainers; [ jecaro ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }
 
