@@ -17,6 +17,11 @@
 , glib
 }:
 
+# Note(Mindavi): ruffle is broken on hybrid NVIDIA systems.
+#                See:
+#                - https://github.com/NVIDIA/egl-wayland/issues/72
+#                - https://github.com/gfx-rs/wgpu/issues/3747
+#                - https://github.com/gfx-rs/wgpu/issues/2519
 rustPlatform.buildRustPackage rec {
   pname = "ruffle";
   version = "nightly-2023-07-10";
