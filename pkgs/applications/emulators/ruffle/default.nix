@@ -19,13 +19,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "ruffle";
-  version = "nightly-2023-04-10";
+  version = "nightly-2023-07-10";
 
   src = fetchFromGitHub {
     owner = "ruffle-rs";
     repo = pname;
     rev = version;
-    sha256 = "sha256-u5Ri9KnYzE3JedUP9fGgYeG8G9uxrL6/zt3KPiKjhU0=";
+    hash = "sha256-ot51ElIDGKOugi1+7I8etZzyANrpsL7NuC33FW9S4nw=";
   };
 
   nativeBuildInputs = [
@@ -78,13 +78,19 @@ rustPlatform.buildRustPackage rec {
   # now, unify both dasp versions to the (newer) Git version.
   # Related issues: #22177, #183344
   cargoPatches = [ ./unify-dasp-version.patch ];
+  postPatch = ''
+    sed -i 's/dasp_sample 0.11.0.*"/dasp_sample"/' Cargo.lock
+    sed -i '1129,1134d' Cargo.lock
+    sed -i 's;git+https://github.com/RustAudio/dasp?rev=f05a703#f05a703d247bb504d7e812b51e95f3765d9c5e94;git+https://github.com/RustAudio/dasp?rev=f05a703d247bb504d7e812b51e95f3765d9c5e94#f05a703d247bb504d7e812b51e95f3765d9c5e94;' Cargo.lock
+    sed -i 's;rev = "f05a703";rev = "f05a703d247bb504d7e812b51e95f3765d9c5e94";' core/Cargo.toml
+  '';
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
       "dasp-0.11.0" = "sha256-CZNgTLL4IG7EJR2xVp9X9E5yre8foY6VX2hUMRawxiI=";
       "flash-lso-0.5.0" = "sha256-9uH3quxRzLtmHJs5WF/GRxWkXL/KFyOl182HKcHNnuc=";
-      "gc-arena-0.2.2" = "sha256-/H9VcTesBD+IA7bUf208b0HQ/cIUDAz9TJBBywf6akA=";
+      "gc-arena-0.3.1" = "sha256-lSwQKWRAg/dMCd3/EVNfpxMhfnKs6DGOl93nuHEMJUA=";
       "h263-rs-0.1.0" = "sha256-4kBg09VHyiQTvUbvcTb5g/BVcOpRFZ1fVEuRWXv5XwE=";
       "nellymoser-rs-0.1.2" = "sha256-GykDQc1XwySOqfxW/OcSxkKCFJyVmwSLy/CEBcwcZJs=";
       "nihav_codec_support-0.1.0" = "sha256-rE9AIiQr+PnHC9xfDQULndSfFHSX4sqKkCAQYVNaJcQ=";
