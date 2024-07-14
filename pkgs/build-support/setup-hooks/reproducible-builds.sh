@@ -2,10 +2,12 @@
 # This should ensure that it is deterministic across rebuilds of the same
 # derivation and not easily collide with other builds.
 # We also truncate the hash so that it cannot cause reference cycles.
+initialSeed=$(echo ${version:-$out} ${pname:-$out} | md5sum)
 NIX_CFLAGS_COMPILE="${NIX_CFLAGS_COMPILE:-} -frandom-seed=$(
-    randSeed=${NIX_OUTPATH_USED_AS_RANDOM_SEED:-$out}
+    randSeed=${NIX_OUTPATH_USED_AS_RANDOM_SEED:-$initialSeed}
     outbase="${randSeed##*/}"
     randomseed="${outbase:0:10}"
     echo $randomseed
 )"
 export NIX_CFLAGS_COMPILE
+

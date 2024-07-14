@@ -28,6 +28,7 @@ in
     # write `patches = (previousAttrs.patches or []) ++ [ ... ]`.
 
     NIX_NO_SELF_RPATH = true;
+    NIX_BLA = 2;
 
     postConfigure = ''
       # Hack: get rid of the `-static' flag set by the bootstrap stdenv.
@@ -71,6 +72,9 @@ in
             # hopefully future glibc releases will not pass that flag.
             "-Wno-error=psabi"
           ])
+          [
+            "-Wl,--build-id=0xdeadbeef"
+          ]
         ]);
     };
 
